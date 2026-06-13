@@ -10,10 +10,10 @@ zabbix_export:
   templates:
     - uuid: 550e8400e29b41d4a71644665544a002
       template: "QNAP NAS LLD SNMP"
-      name: "QNAP NAS LLD SNMP v0.0.4"
+      name: "QNAP NAS LLD SNMP v0.0.5"
       description: |
         Production‑ready SNMP Low‑Level Discovery (LLD) template for QNAP NAS storage devices.
-        Version: 0.0.4
+        Version: 0.0.5
         Author: Majid Abdollahi
 
         This template provides complete, multi‑layer monitoring coverage for QNAP NAS systems using
@@ -168,6 +168,65 @@ zabbix_export:
               tags:
                 - { tag: component, value: system }
                 - { tag: scope, value: capacity }
+
+        - uuid: 550e8400e29b41d4a71644665544e001
+          name: "NVMe Cache: Health status"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.50.1.1.0"
+          key: qnap.nvme.health
+          delay: 5m
+          valuemap:
+            name: "Health Status"
+          tags:
+            - { tag: component, value: nvme }
+            - { tag: component, value: cache }
+          triggers:
+            - uuid: 550e8400e29b41d4a71644665544e002
+              name: "NVMe Cache: Health issue detected"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.nvme.health)<>1"
+              priority: HIGH
+              tags:
+                - { tag: component, value: nvme }
+                - { tag: scope, value: availability }
+
+        - uuid: 550e8400e29b41d4a71644665544e010
+          name: "SSD Cache: Wear level (%)"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.50.2.1.0"
+          key: qnap.ssd.wear
+          delay: 10m
+          units: "%"
+          tags:
+            - { tag: component, value: ssd }
+            - { tag: component, value: cache }
+          triggers:
+            - uuid: 550e8400e29b41d4a71644665544e011
+              name: "SSD Cache: Wear level critical"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.ssd.wear)>80"
+              priority: HIGH
+              tags:
+                - { tag: component, value: ssd }
+                - { tag: scope, value: capacity }
+
+        - uuid: 550e8400e29b41d4a71644665544e020
+          name: "BBU: Status"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.50.3.1.0"
+          key: qnap.bbu.status
+          delay: 5m
+          valuemap:
+            name: "Health Status"
+          tags:
+            - { tag: component, value: bbu }
+            - { tag: component, value: cache }
+          triggers:
+            - uuid: 550e8400e29b41d4a71644665544e021
+              name: "BBU: Failure detected"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.bbu.status)<>1"
+              priority: HIGH
+              tags:
+                - { tag: component, value: bbu }
+                - { tag: scope, value: availability }
 
         - uuid: 550e8400e29b41d4a71644665544a00f
           name: "System: Uptime"
@@ -848,6 +907,33 @@ zabbix_export:
                 - { tag: component, value: ups }
                 - { tag: component, value: health }
           trigger_prototypes: [] # ← REQUIRED
+
+        - uuid: 550e8400e29b41d4a71644665544e030
+          name: "PCIe Expansion Card Discovery"
+          type: SNMP_AGENT
+          snmp_oid: "discovery[{#PCIEINDEX},1.3.6.1.4.1.55062.1.60.1.1,{#PCIENAME},1.3.6.1.4.1.55062.1.60.1.2]"
+          key: qnap.pcie.discovery
+          delay: 30m
+          item_prototypes:
+            - uuid: 550e8400e29b41d4a71644665544e031
+              name: "PCIe {#PCIENAME}: Status"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.60.1.3.{#PCIEINDEX}"
+              key: "qnap.pcie.status[{#PCIEINDEX}]"
+              delay: 10m
+              valuemap:
+                name: "Health Status"
+              tags:
+                - { tag: component, value: pcie }
+                - { tag: component, value: hardware }
+          trigger_prototypes:
+            - uuid: 550e8400e29b41d4a71644665544e032
+              name: "PCIe {#PCIENAME}: Hardware issue detected"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.pcie.status[{#PCIEINDEX}])<>1"
+              priority: HIGH
+              tags:
+                - { tag: component, value: pcie }
+                - { tag: scope, value: availability }
 
       valuemaps:
         - uuid: 550e8400e29b41d4a71644665544a517
