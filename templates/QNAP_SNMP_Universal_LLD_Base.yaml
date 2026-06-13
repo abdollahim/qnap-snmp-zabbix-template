@@ -10,10 +10,10 @@ zabbix_export:
   templates:
     - uuid: 550e8400e29b41d4a71644665544a002
       template: "QNAP NAS LLD SNMP"
-      name: "QNAP NAS LLD SNMP v0.0.3"
+      name: "QNAP NAS LLD SNMP v0.0.4"
       description: |
         Production‑ready SNMP Low‑Level Discovery (LLD) template for QNAP NAS storage devices.
-        Version: 0.0.3
+        Version: 0.0.4
         Author: Majid Abdollahi
 
         This template provides complete, multi‑layer monitoring coverage for QNAP NAS systems using
@@ -233,6 +233,26 @@ zabbix_export:
                 - { tag: component, value: system }
                 - { tag: scope, value: maintenance }
 
+        - uuid: 550e8400e29b41d4a71644665544d020
+          name: "Security: Firmware integrity status"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.40.2.1.0"
+          key: qnap.security.fw.integrity
+          delay: 1h
+          valuemap:
+            name: "Health Status"
+          tags:
+            - { tag: component, value: security }
+            - { tag: component, value: firmware }
+          triggers:
+            - uuid: 550e8400e29b41d4a71644665544d021
+              name: "Security: Firmware integrity issue detected"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.security.fw.integrity)<>1"
+              priority: HIGH
+              tags:
+                - { tag: component, value: security }
+                - { tag: scope, value: integrity }
+
         - uuid: 550e8400e29b41d4a71644665544a014
           name: "SNMP agent availability"
           type: INTERNAL
@@ -249,6 +269,175 @@ zabbix_export:
               tags:
                 - { tag: component, value: availability }
                 - { tag: scope, value: connectivity }
+
+        - uuid: 550e8400e29b41d4a71644665544c001
+          name: "Service: SMB status"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.20.1.1.0"
+          key: qnap.service.smb
+          delay: 5m
+          valuemap:
+            name: "System On/Off"
+          tags:
+            - { tag: component, value: service }
+            - { tag: service, value: smb }
+          triggers:
+            - uuid: 550e8400e29b41d4a71644665544c010
+              name: "Service: SMB is down"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.service.smb)=0"
+              priority: HIGH
+              tags:
+                - { tag: component, value: service }
+                - { tag: scope, value: availability }
+
+        - uuid: 550e8400e29b41d4a71644665544c002
+          name: "Service: AFP status"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.20.1.2.0"
+          key: qnap.service.afp
+          delay: 5m
+          valuemap:
+            name: "System On/Off"
+          tags:
+            - { tag: component, value: service }
+            - { tag: service, value: afp }
+
+        - uuid: 550e8400e29b41d4a71644665544c003
+          name: "Service: NFS status"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.20.1.3.0"
+          key: qnap.service.nfs
+          delay: 5m
+          valuemap:
+            name: "System On/Off"
+          tags:
+            - { tag: component, value: service }
+            - { tag: service, value: nfs }
+          triggers:
+            - uuid: 550e8400e29b41d4a71644665544c011
+              name: "Service: NFS is down"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.service.nfs)=0"
+              priority: HIGH
+              tags:
+                - { tag: component, value: service }
+                - { tag: scope, value: availability }
+
+        - uuid: 550e8400e29b41d4a71644665544c004
+          name: "Service: FTP status"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.20.1.4.0"
+          key: qnap.service.ftp
+          delay: 5m
+          valuemap:
+            name: "System On/Off"
+          tags:
+            - { tag: component, value: service }
+            - { tag: service, value: ftp }
+          triggers:
+            - uuid: 550e8400e29b41d4a71644665544c012
+              name: "Service: FTP is down"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.service.ftp)=0"
+              priority: WARNING
+              tags:
+                - { tag: component, value: service }
+                - { tag: scope, value: availability }
+
+        - uuid: 550e8400e29b41d4a71644665544c005
+          name: "Service: SSH status"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.20.1.5.0"
+          key: qnap.service.ssh
+          delay: 5m
+          valuemap:
+            name: "System On/Off"
+          tags:
+            - { tag: component, value: service }
+            - { tag: service, value: ssh }
+          triggers:
+            - uuid: 550e8400e29b41d4a71644665544c013
+              name: "Service: SSH is down"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.service.ssh)=0"
+              priority: HIGH
+              tags:
+                - { tag: component, value: service }
+                - { tag: scope, value: availability }
+
+        - uuid: 550e8400e29b41d4a71644665544c020
+          name: "System: Event log error count"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.30.1.1.0"
+          key: qnap.system.event.errors
+          delay: 10m
+          tags:
+            - { tag: component, value: system }
+            - { tag: component, value: health }
+          triggers:
+            - uuid: 550e8400e29b41d4a71644665544c021
+              name: "System: New error events detected"
+              expression: "change(/QNAP NAS LLD SNMP/qnap.system.event.errors)>0"
+              priority: WARNING
+              tags:
+                - { tag: component, value: system }
+                - { tag: scope, value: health }
+
+        - uuid: 550e8400e29b41d4a71644665544d001
+          name: "Security: Failed login attempts"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.40.1.1.0"
+          key: qnap.security.failed.logins
+          delay: 5m
+          tags:
+            - { tag: component, value: security }
+            - { tag: scope, value: authentication }
+          triggers:
+            - uuid: 550e8400e29b41d4a71644665544d002
+              name: "Security: Excessive failed login attempts detected"
+              expression: "change(/QNAP NAS LLD SNMP/qnap.security.failed.logins)>5"
+              priority: HIGH
+              tags:
+                - { tag: component, value: security }
+                - { tag: scope, value: intrusion }
+
+        - uuid: 550e8400e29b41d4a71644665544d010
+          name: "System: Last boot time"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.2.1.25.1.1.0"
+          key: qnap.system.lastboot
+          delay: 10m
+          units: uptime
+          preprocessing:
+            - { type: MULTIPLIER, parameters: ["0.01"] }
+          tags:
+            - { tag: component, value: system }
+            - { tag: component, value: health }
+          triggers:
+            - uuid: 550e8400e29b41d4a71644665544d011
+              name: "System: Unexpected reboot detected"
+              expression: "change(/QNAP NAS LLD SNMP/qnap.system.lastboot)<0"
+              priority: WARNING
+              tags:
+                - { tag: component, value: system }
+                - { tag: scope, value: availability }
+
+        - uuid: 550e8400e29b41d4a71644665544d030
+          name: "Security: Malware scan result"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.40.3.1.0"
+          key: qnap.security.malware.scan
+          delay: 1h
+          valuemap:
+            name: "Alarm state"
+          tags:
+            - { tag: component, value: security }
+            - { tag: component, value: antivirus }
+          triggers:
+            - uuid: 550e8400e29b41d4a71644665544d031
+              name: "Security: Malware detected"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.security.malware.scan)=2"
+              priority: DISASTER
+              tags:
+                - { tag: component, value: security }
+                - { tag: scope, value: threat }
 
       discovery_rules:
         - uuid: 550e8400e29b41d4a71644665544b100
