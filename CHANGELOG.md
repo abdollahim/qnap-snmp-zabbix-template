@@ -106,3 +106,22 @@ template beyond hardware into QNAP’s internal service stack.
 ### Notes
 This version expands the template into the security domain, enabling early detection of
 intrusion attempts, firmware tampering, and malware activity.
+
+---
+
+## [0.0.5] — Enterprise Hardware Extensions
+
+### Added
+- NVMe cache health monitoring
+- SSD cache wear‑level tracking
+- BBU (battery‑backed write cache) status monitoring
+- PCIe expansion card discovery and status
+- Triggers for NVMe, SSD, BBU, and PCIe failures
+
+### Improved
+- Extended enterprise hardware visibility
+- Prepared the template for performance analytics in v0.1.0
+
+### Notes
+This version targets enterprise and high‑end QNAP models, adding deeper hardware intelligence
+and redundancy awareness.
