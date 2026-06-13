@@ -125,3 +125,23 @@ intrusion attempts, firmware tampering, and malware activity.
 ### Notes
 This version targets enterprise and high‑end QNAP models, adding deeper hardware intelligence
 and redundancy awareness.
+
+---
+
+## [0.1.0] — Performance & Capacity Analytics
+
+### Added
+- Pool IOPS (read/write)
+- Pool throughput (read/write)
+- RAID rebuild progress monitoring
+- Predictive capacity analytics (pool & volume full date)
+- CPU load averages (1m/5m/15m)
+- Trend‑based triggers for capacity forecasting
+
+### Improved
+- Template now includes performance and analytics capabilities
+- Foundation for advanced anomaly detection in v0.2.0
+
+### Notes
+This version transforms the template into a performance‑aware monitoring system capable of
+forecasting capacity exhaustion and tracking real‑time storage performance.
