@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [1.1.10] — Initial Release
+## [0.0.1] — Initial Release
 ### Added
 - Full SNMP‑based monitoring template for QNAP NAS devices
 - CPU monitoring (temperature, usage)
