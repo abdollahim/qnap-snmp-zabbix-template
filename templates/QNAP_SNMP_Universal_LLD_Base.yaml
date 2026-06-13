@@ -10,10 +10,10 @@ zabbix_export:
   templates:
     - uuid: 550e8400e29b41d4a71644665544a002
       template: "QNAP NAS LLD SNMP"
-      name: "QNAP NAS LLD SNMP v0.0.5"
+      name: "QNAP NAS LLD SNMP v0.1.0"
       description: |
         Production‑ready SNMP Low‑Level Discovery (LLD) template for QNAP NAS storage devices.
-        Version: 0.0.5
+        Version: 0.1.0
         Author: Majid Abdollahi
 
         This template provides complete, multi‑layer monitoring coverage for QNAP NAS systems using
@@ -127,6 +127,33 @@ zabbix_export:
               tags:
                 - { tag: component, value: cpu }
                 - { tag: scope, value: performance }
+
+        - uuid: 550e8400e29b41d4a71644665544f030
+          name: "CPU: Load average (1m)"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.3.10.1.0"
+          key: qnap.cpu.load1
+          delay: 1m
+          tags:
+            - { tag: component, value: cpu }
+
+        - uuid: 550e8400e29b41d4a71644665544f031
+          name: "CPU: Load average (5m)"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.3.10.2.0"
+          key: qnap.cpu.load5
+          delay: 1m
+          tags:
+            - { tag: component, value: cpu }
+
+        - uuid: 550e8400e29b41d4a71644665544f032
+          name: "CPU: Load average (15m)"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.3.10.3.0"
+          key: qnap.cpu.load15
+          delay: 1m
+          tags:
+            - { tag: component, value: cpu }
 
         - uuid: 550e8400e29b41d4a71644665544a00c
           name: "System: Total memory"
@@ -682,10 +709,82 @@ zabbix_export:
               tags:
                 - { tag: component, value: pool }
 
+            - uuid: 550e8400e29b41d4a71644665544f001
+              name: "Pool {#POOLINDEX}: Read IOPS"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.10.7.1.10.{#POOLINDEX}"
+              key: "qnap.pool.iops.read[{#POOLINDEX}]"
+              delay: 1m
+              units: ops
+              preprocessing:
+                - { type: CHANGE_PER_SECOND, parameters: [""] }
+              tags:
+                - { tag: component, value: pool }
+                - { tag: component, value: performance }
+
+            - uuid: 550e8400e29b41d4a71644665544f002
+              name: "Pool {#POOLINDEX}: Write IOPS"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.10.7.1.11.{#POOLINDEX}"
+              key: "qnap.pool.iops.write[{#POOLINDEX}]"
+              delay: 1m
+              units: ops
+              preprocessing:
+                - { type: CHANGE_PER_SECOND, parameters: [""] }
+              tags:
+                - { tag: component, value: pool }
+                - { tag: component, value: performance }
+
+            - uuid: 550e8400e29b41d4a71644665544f003
+              name: "Pool {#POOLINDEX}: Read throughput"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.10.7.1.12.{#POOLINDEX}"
+              key: "qnap.pool.throughput.read[{#POOLINDEX}]"
+              delay: 1m
+              units: Bps
+              preprocessing:
+                - { type: CHANGE_PER_SECOND, parameters: [""] }
+              tags:
+                - { tag: component, value: pool }
+                - { tag: component, value: performance }
+
+            - uuid: 550e8400e29b41d4a71644665544f004
+              name: "Pool {#POOLINDEX}: Write throughput"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.10.7.1.13.{#POOLINDEX}"
+              key: "qnap.pool.throughput.write[{#POOLINDEX}]"
+              delay: 1m
+              units: Bps
+              preprocessing:
+                - { type: CHANGE_PER_SECOND, parameters: [""] }
+              tags:
+                - { tag: component, value: pool }
+                - { tag: component, value: performance }
+
+            - uuid: 550e8400e29b41d4a71644665544f020
+              name: "Pool {#POOLINDEX}: Days until full"
+              type: CALCULATED
+              key: "qnap.pool.days.full[{#POOLINDEX}]"
+              delay: 1h
+              value_type: FLOAT
+              units: "days"
+              params: "forecast(//qnap.pool.free.pct[{#POOLINDEX}],7d,0)"
+              tags:
+                - { tag: component, value: pool }
+                - { tag: component, value: analytics }
+
           trigger_prototypes:
             - uuid: 550e8400e29b41d4a71644665544a037
               name: "Pool {#POOLINDEX}: Free space is below threshold"
               expression: "last(/QNAP NAS LLD SNMP/qnap.pool.free.pct[{#POOLINDEX}])<{$POOL_SIZE_ALARM}"
+              priority: WARNING
+              tags:
+                - { tag: component, value: pool }
+                - { tag: scope, value: capacity }
+
+            - uuid: 550e8400e29b41d4a71644665544f021
+              name: "Pool {#POOLINDEX}: Predicted to run out of space soon"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.pool.days.full[{#POOLINDEX}])<7"
               priority: WARNING
               tags:
                 - { tag: component, value: pool }
@@ -727,10 +826,30 @@ zabbix_export:
               tags:
                 - { tag: component, value: volume }
 
+            - uuid: 550e8400e29b41d4a71644665544f022
+              name: "Volume {#VOLNAME}: Days until full"
+              type: CALCULATED
+              key: "qnap.volume.days.full[{#VOLINDEX}]"
+              delay: 1h
+              value_type: FLOAT
+              units: "days"
+              params: "forecast(//qnap.volume.free.pct[{#VOLINDEX}],7d,0)"
+              tags:
+                - { tag: component, value: volume }
+                - { tag: component, value: analytics }
+
           trigger_prototypes:
             - uuid: 550e8400e29b41d4a71644665544a038
               name: "Volume {#VOLNAME}: Free space is below threshold"
               expression: "last(/QNAP NAS LLD SNMP/qnap.volume.free.pct[{#VOLINDEX}])<20"
+              priority: WARNING
+              tags:
+                - { tag: component, value: volume }
+                - { tag: scope, value: capacity }
+
+            - uuid: 550e8400e29b41d4a71644665544f023
+              name: "Volume {#VOLNAME}: Predicted to run out of space soon"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.volume.days.full[{#VOLINDEX}])<7"
               priority: WARNING
               tags:
                 - { tag: component, value: volume }
@@ -784,6 +903,17 @@ zabbix_export:
               tags:
                 - { tag: component, value: raid }
 
+            - uuid: 550e8400e29b41d4a71644665544f010
+              name: "RAID Group {#RGINDEX}: Rebuild progress (%)"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.10.6.1.6.{#RGINDEX}"
+              key: "qnap.raid.rebuild.progress[{#RGINDEX}]"
+              delay: 1m
+              units: "%"
+              tags:
+                - { tag: component, value: raid }
+                - { tag: component, value: performance }
+
           trigger_prototypes:
             - uuid: 550e8400e29b41d4a71644665544a036
               name: "RAID Group {#RGINDEX}: Status is not optimal"
@@ -792,6 +922,14 @@ zabbix_export:
               tags:
                 - { tag: component, value: raid }
                 - { tag: scope, value: availability }
+
+            - uuid: 550e8400e29b41d4a71644665544f011
+              name: "RAID Group {#RGINDEX}: Rebuild in progress"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.raid.rebuild.progress[{#RGINDEX}])>0"
+              priority: INFO
+              tags:
+                - { tag: component, value: raid }
+                - { tag: scope, value: maintenance }
 
         - uuid: 550e8400e29b41d4a71644665544a02c
           name: "PSU Discovery"
