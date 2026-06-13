@@ -10,10 +10,10 @@ zabbix_export:
   templates:
     - uuid: 550e8400e29b41d4a71644665544a002
       template: "QNAP NAS LLD SNMP"
-      name: "QNAP NAS LLD SNMP v1.1.10"
+      name: "QNAP NAS LLD SNMP v0.0.2"
       description: |
         Production‑ready SNMP Low‑Level Discovery (LLD) template for QNAP NAS storage devices.
-        Version: 1.1.10
+        Version: 0.0.2
         Author: Majid Abdollahi
 
         This template provides complete, multi‑layer monitoring coverage for QNAP NAS systems using
@@ -74,6 +74,12 @@ zabbix_export:
           value: "20"
         - macro: "{$MEMORY_FREE_ALARM}"
           value: "10"
+        - macro: "{$TEMP_CPU_GROUP}"
+          value: "CPU"
+        - macro: "{$TEMP_SYS_GROUP}"
+          value: "System"
+        - macro: "{$TEMP_HDD_GROUP}"
+          value: "HDD"
 
       items:
         - uuid: 550e8400e29b41d4a71644665544a009
@@ -245,22 +251,20 @@ zabbix_export:
                 - { tag: scope, value: connectivity }
 
       discovery_rules:
-        - uuid: 550e8400e29b41d4a71644665544a015
-          name: "Network interfaces discovery"
+        - uuid: 550e8400e29b41d4a71644665544b100
+          name: "Network Interface LLD (IF-MIB)"
           type: SNMP_AGENT
-          snmp_oid: "discovery[{#IFINDEX},1.3.6.1.4.1.24681.1.2.9.1.1,{#IFNAME},1.3.6.1.4.1.24681.1.2.9.1.2]"
-          key: qnap.net.if.discovery
-          delay: 15m
-          filter:
-            conditions:
-              - { macro: "{#IFNAME}", value: "{$NET_IF_MATCHES}", formulaid: A }
+          snmp_oid: "discovery[{#SNMPINDEX},1.3.6.1.2.1.2.2.1.1,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1]"
+          key: if.discovery
+          delay: 30m
+
           item_prototypes:
-            - uuid: 550e8400e29b41d4a71644665544a016
-              name: "Interface {#IFNAME}: Bits received"
+            - uuid: 550e8400e29b41d4a71644665544b101
+              name: "Interface {#IFNAME}: Incoming traffic"
               type: SNMP_AGENT
-              snmp_oid: "1.3.6.1.4.1.24681.1.2.9.1.3.{#IFINDEX}"
-              key: "qnap.net.if.in[{#IFINDEX}]"
-              delay: 5m
+              snmp_oid: "1.3.6.1.2.1.2.2.1.10.{#SNMPINDEX}"
+              key: "if.in[{#IFNAME}]"
+              delay: 1m
               units: bps
               preprocessing:
                 - { type: CHANGE_PER_SECOND, parameters: [""] }
@@ -268,18 +272,38 @@ zabbix_export:
               tags:
                 - { tag: component, value: network }
 
-            - uuid: 550e8400e29b41d4a71644665544a017
-              name: "Interface {#IFNAME}: Bits sent"
+            - uuid: 550e8400e29b41d4a71644665544b102
+              name: "Interface {#IFNAME}: Outgoing traffic"
               type: SNMP_AGENT
-              snmp_oid: "1.3.6.1.4.1.24681.1.2.9.1.4.{#IFINDEX}"
-              key: "qnap.net.if.out[{#IFINDEX}]"
-              delay: 5m
+              snmp_oid: "1.3.6.1.2.1.2.2.1.16.{#SNMPINDEX}"
+              key: "if.out[{#IFNAME}]"
+              delay: 1m
               units: bps
               preprocessing:
                 - { type: CHANGE_PER_SECOND, parameters: [""] }
                 - { type: MULTIPLIER, parameters: ["8"] }
               tags:
                 - { tag: component, value: network }
+
+            - uuid: 550e8400e29b41d4a71644665544b103
+              name: "Interface {#IFNAME}: Operational status"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}"
+              key: "if.status[{#IFNAME}]"
+              delay: 1m
+              valuemap:
+                name: "IF-MIB Operational Status"
+              tags:
+                - { tag: component, value: network }
+
+          trigger_prototypes:
+            - uuid: 550e8400e29b41d4a71644665544b104
+              name: "Interface {#IFNAME}: Link down"
+              expression: "last(/QNAP NAS LLD SNMP/if.status[{#IFNAME}])<>1"
+              priority: WARNING
+              tags:
+                - { tag: component, value: network }
+                - { tag: scope, value: availability }
 
         - uuid: 550e8400e29b41d4a71644665544a018
           name: "FAN Discovery"
@@ -309,6 +333,15 @@ zabbix_export:
               tags:
                 - { tag: component, value: system }
                 - { tag: component, value: health }
+
+          trigger_prototypes:
+            - uuid: 550e8400e29b41d4a71644665544b105
+              name: "{#FANNAME}: Speed is below safe threshold"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.fan.speed[{#FANINDEX}])<500"
+              priority: WARNING
+              tags:
+                - { tag: component, value: system }
+                - { tag: scope, value: performance }
 
         - uuid: 550e8400e29b41d4a71644665544a01b
           name: "Disk Discovery"
@@ -531,6 +564,18 @@ zabbix_export:
                 - { tag: component, value: psu }
                 - { tag: component, value: health }
 
+            - uuid: 550e8400e29b41d4a71644665544b106
+              name: "PSU {#PSUINDEX}: Redundancy state"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.12.10.1.4.{#PSUINDEX}"
+              key: "qnap.psu.redundancy[{#PSUINDEX}]"
+              delay: 5m
+              valuemap:
+                name: "System On/Off"
+              tags:
+                - { tag: component, value: psu }
+                - { tag: component, value: health }
+
           trigger_prototypes:
             - uuid: 550e8400e29b41d4a71644665544a039
               name: "PSU {#PSUINDEX}: Failure detected"
@@ -665,3 +710,13 @@ zabbix_export:
           mappings:
             - { value: "0", newvalue: "Off" }
             - { value: "1", newvalue: "On" }
+        - uuid: 550e8400e29b41d4a71644665544b200
+          name: "IF-MIB Operational Status"
+          mappings:
+            - { value: "1", newvalue: "Up" }
+            - { value: "2", newvalue: "Down" }
+            - { value: "3", newvalue: "Testing" }
+            - { value: "4", newvalue: "Unknown" }
+            - { value: "5", newvalue: "Dormant" }
+            - { value: "6", newvalue: "NotPresent" }
+            - { value: "7", newvalue: "LowerLayerDown" }
