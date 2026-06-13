@@ -10,10 +10,10 @@ zabbix_export:
   templates:
     - uuid: 550e8400e29b41d4a71644665544a002
       template: "QNAP NAS LLD SNMP"
-      name: "QNAP NAS LLD SNMP v0.0.2"
+      name: "QNAP NAS LLD SNMP v0.0.3"
       description: |
         Production‑ready SNMP Low‑Level Discovery (LLD) template for QNAP NAS storage devices.
-        Version: 0.0.2
+        Version: 0.0.3
         Author: Majid Abdollahi
 
         This template provides complete, multi‑layer monitoring coverage for QNAP NAS systems using
