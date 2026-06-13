@@ -64,3 +64,25 @@ All notable changes to this project will be documented in this file.
 This version expands hardware visibility and prepares the template for performance analytics
 in v0.1.0.
 
+---
+
+## [0.0.3] — System Services & Reliability Layer
+
+### Added
+- Monitoring for QNAP core services:
+  - SMB
+  - AFP
+  - NFS
+  - FTP
+  - SSH
+- Triggers for service failures
+- System event log error counter
+- Trigger for new system error events
+
+### Improved
+- Expanded service‑level visibility
+- Foundation for QNAP app and backup job monitoring in v0.2.0
+
+### Notes
+This version focuses on operational reliability and service availability, extending the
+template beyond hardware into QNAP’s internal service stack.
