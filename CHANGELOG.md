@@ -46,8 +46,21 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## Planned for Next Release
-- SMART attribute monitoring (if SNMP OIDs available)
-- Network interface LLD (if QNAP exposes IF‑MIB fully)
-- Dashboard widgets for QNAP overview
-- Performance graphs for pools/volumes
+## [0.0.2] — Storage & Hardware Enhancements
+
+### Added
+- IF‑MIB network interface LLD (RX/TX, speed, status)
+- Fan RPM threshold alerting
+- PSU redundancy state monitoring
+- Temperature sensor grouping macros
+- New valuemap: IF-MIB Operational Status
+
+### Improved
+- Normalized tags across LLD prototypes
+- Improved temperature‑based triggers
+- Optimized polling intervals for hardware metrics
+
+### Notes
+This version expands hardware visibility and prepares the template for performance analytics
+in v0.1.0.
+
