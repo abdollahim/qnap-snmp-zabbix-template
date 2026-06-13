@@ -2,7 +2,7 @@
 Production‑ready SNMP Low‑Level Discovery (LLD) template for QNAP NAS storage devices.  
 Designed for Zabbix 7.4+ with full compatibility validation for Zabbix 8.x.
 
-**Version:** 1.1.10
+**Version:** 0.0.1
 **Author:** Majid Abdollahi
 
 ---
