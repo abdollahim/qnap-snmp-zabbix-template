@@ -86,3 +86,23 @@ in v0.1.0.
 ### Notes
 This version focuses on operational reliability and service availability, extending the
 template beyond hardware into QNAP’s internal service stack.
+
+---
+
+## [0.0.4] — Security & Health Monitoring Layer
+
+### Added
+- Failed login attempt counter
+- Trigger for excessive failed logins
+- Unexpected reboot detection
+- Firmware integrity monitoring
+- Malware scan result monitoring (if supported by model)
+- Security‑focused triggers (intrusion, integrity, malware)
+
+### Improved
+- Strengthened system reliability and security visibility
+- Foundation for advanced security analytics in v0.3.0
+
+### Notes
+This version expands the template into the security domain, enabling early detection of
+intrusion attempts, firmware tampering, and malware activity.
