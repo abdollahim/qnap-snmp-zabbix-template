@@ -331,3 +331,51 @@ This release elevates the template into a **full enterprise‑grade monitoring s
 SLA metrics, dashboards, multi‑NAS aggregation, and dual‑controller support.  
 Version 0.4.0 prepares the foundation for the final v1.0.0 release, which will focus on
 predictive analytics, automated documentation, and model‑specific optimizations.
+
+---
+
+# QNAP NAS LLD SNMP — Changelog
+
+## [0.6.0] — Predictive Analytics, NVMe Endurance, RAID ETA, Thermal Drift
+**Release date:** 2026‑06‑14  
+**Author:** Majid Abdollahi
+
+### Added
+- **Predictive Disk Failure Score** (per‑disk DEPENDENT item)
+  - Combines temperature, wear‑leveling count, and remaining‑life percentage
+  - New trigger prototypes for *high risk* and *degraded predictive health*
+- **Disk Wear‑Leveling Count** and **Remaining Life (%)** item prototypes
+- **NVMe Endurance Monitoring**
+  - TBW (Total Bytes Written)
+  - Remaining endurance percentage
+  - Critical endurance trigger (<10%)
+- **RAID Rebuild ETA Calculation**
+  - New item prototype for rebuild progress
+  - DEPENDENT item for ETA (minutes)
+  - Trigger for rebuild ETA exceeding 24 hours
+- **Temperature Trend (1h)** per sensor
+  - DEPENDENT item using Trend.avg()
+  - Trigger for thermal drift >10°C in 1 hour
+
+### Improved
+- Unified disk discovery macros (`{#HDDINDEX}`, `{#HDDSLOT}`) across all disk‑related items
+- Updated all dependent items to correctly reference master items inside the same LLD rule
+- Enhanced temperature sensor grouping with consistent tagging (`temp_group`)
+- Improved NVMe/SSD cache monitoring tags for dashboard filtering
+- Cleaned up inconsistent item naming for HDD/NVMe/SSD components
+
+### Fixed
+- Resolved `master_itemid not found` errors caused by mismatched LLD macros
+- Corrected SNMP OIDs for wear‑leveling and remaining‑life metrics
+- Removed invalid CALCULATED SLA item using unsupported wildcard aggregation
+- Fixed trigger expressions referencing incorrect macros (`{#DISKINDEX}` → `{#HDDINDEX}`)
+- Eliminated leftover trendavg() CALCULATED items from earlier versions
+
+### Removed
+- Deprecated CALCULATED SLA predictive score (replaced with trigger‑based SLA logic)
+- Removed unused disk state mappings from legacy QNAP OID branches
+
+---
+
+## Summary
+Version **0.6.0** introduces the first generation of **predictive analytics** for QNAP NAS monitoring, including disk health scoring, NVMe endurance tracking, RAID rebuild forecasting, and temperature drift detection. This release significantly enhances reliability, early‑warning capabilities, and long‑term storage health visibility across all QNAP NAS models.
