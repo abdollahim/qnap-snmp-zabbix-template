@@ -10,10 +10,10 @@ zabbix_export:
   templates:
     - uuid: 605f422e65104122b30db8c336da0a16
       template: "QNAP NAS LLD SNMP"
-      name: "QNAP NAS LLD SNMP v0.3.0"
+      name: "QNAP NAS LLD SNMP v0.4.0"
       description: |
         Production‑ready SNMP Low‑Level Discovery (LLD) template for QNAP NAS storage devices.
-        Version: 0.3.0
+        Version: 0.4.0
         Author: Majid Abdollahi
 
         This template provides complete, multi‑layer monitoring coverage for QNAP NAS systems using
@@ -34,6 +34,7 @@ zabbix_export:
           • Temperature sensor discovery with per‑sensor thresholds, grouping (CPU/System/HDD/Ambient),
             and alerting
           • UPS, PSU, NVMe, SSD cache, and BBU health monitoring for enterprise‑grade reliability
+          • Dual‑controller awareness (role/failover) and PCIe link health for enterprise chassis
 
         Advanced Monitoring:
           • Threshold‑based alerting for HDD temperature (warning/critical)
@@ -46,20 +47,26 @@ zabbix_export:
           • Service‑level monitoring for SMB, AFP, NFS, FTP, SSH
           • Security‑focused monitoring including failed login bursts, intrusion detection,
             unexpected reboot detection, and system event log visibility
+          • SLA‑oriented metrics for availability, performance, and capacity with dedicated triggers
+          • Fleet‑level capacity and RAID health aggregation across multiple NAS units
+          • Trend‑based analytics for IOPS, throughput, and temperature anomalies
 
         Template Architecture:
           • Fully LLD‑driven storage, hardware, service, and security monitoring — no manual configuration required
           • Clean separation of static system items and dynamic LLD components
           • Optimized polling intervals for performance‑critical vs. slow‑changing metrics
-          • Native Zabbix valuemap support for RAID, PSU, UPS, fan, health, alarm state, and security states
-          • Consistent naming, tagging, and key structure for dashboards, filtering, and analytics
+          • Native Zabbix valuemap support for RAID, PSU, UPS, fan, health, alarm state, security,
+            SLA state, PCIe link state, and controller role
+          • Consistent naming, tagging, and key structure for dashboards, filtering, SLA views,
+            fleet‑level analytics, and multi‑NAS reporting
           • Predictive analytics for pool/volume capacity exhaustion and trend‑based forecasting
 
         Intended Use:
           • Suitable for all QNAP NAS models supporting SNMP v2/v3
           • Designed for production environments requiring deep visibility into storage health,
-            performance, security, and hardware reliability
+            performance, security, SLA compliance, and hardware reliability
           • Ideal for NOC/SOC teams, storage administrators, and environments with multiple QNAP units
+            and enterprise/dual‑controller chassis
 
         Compatibility:
           • Fully compatible with Zabbix 7.4
@@ -163,6 +170,93 @@ zabbix_export:
           delay: 1m
           tags:
             - { tag: component, value: cpu }
+
+        - uuid: ecb221080e7c45209ca14c1ea360fea1
+          name: "SLA: Availability %"
+          type: CALCULATED
+          key: qnap.sla.availability
+          params: "100*(last(//icmpping)=1)"
+          delay: 5m
+          units: "%"
+          tags:
+            - { tag: sla, value: availability }
+          triggers:
+            - uuid: f0a42913fb0545fc98c849f3fd4ae6a0
+              name: "SLA: Availability below threshold"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.sla.availability)<{$SLA_AVAILABILITY_MIN}"
+              priority: WARNING
+              tags:
+                - { tag: sla, value: availability }
+
+        - uuid: 67a1464b1bb3458ea75436e8732a42d4
+          name: "SLA: Performance %"
+          type: CALCULATED
+          key: qnap.sla.performance
+          params: "100 - avg(//system.cpu.util[,idle],5m)"
+          delay: 5m
+          units: "%"
+          tags:
+            - { tag: sla, value: performance }
+          triggers:
+            - uuid: 5900858ddb7847638ffa1ed4b7052973
+              name: "SLA: Performance below threshold"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.sla.performance)<{$SLA_PERFORMANCE_MIN}"
+              priority: WARNING
+              tags:
+                - { tag: sla, value: performance }
+
+        - uuid: 87b4153390c94304bb9d8d3726ccfde3
+          name: "SLA: Capacity %"
+          type: CALCULATED
+          key: qnap.sla.capacity
+          params: "100 - (last(//vfs.fs.size[/,pfree]))"
+          delay: 5m
+          units: "%"
+          tags:
+            - { tag: sla, value: capacity }
+          triggers:
+            - uuid: 41428bb07109480ea10e215a03929f90
+              name: "SLA: Capacity below threshold"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.sla.capacity)<{$SLA_CAPACITY_MIN}"
+              priority: WARNING
+              tags:
+                - { tag: sla, value: capacity }
+
+        - uuid: 079d379fe0c94959907dea9c8b6ccac1
+          name: "Fleet: RAID Health Monitor"
+          type: CALCULATED
+          key: qnap.fleet.raid.health
+          params: "0"
+          delay: 1h
+          tags:
+            - { tag: component, value: fleet }
+          triggers:
+            - uuid: acf8bf05b75649848ef51f83f137488d
+              name: "Fleet: Multiple NAS units reporting degraded RAID"
+              expression: "count(/QNAP NAS LLD SNMP/qnap.raid.status[*],#1,ne,1)>2"
+              priority: HIGH
+              tags:
+                - { tag: component, value: fleet }
+
+        - uuid: 43c33929ad1f486e9887d284e35a742e
+          name: "Controller: Role"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.20.1.1.0"
+          key: qnap.controller.role
+          valuemap:
+            name: "Controller Role"
+          tags:
+            - { tag: component, value: controller }
+
+        - uuid: 4a515c107fa140598bb4acd81fb50070
+          name: "Controller: Failover State"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.20.1.2.0"
+          key: qnap.controller.failover
+          valuemap:
+            name: "Health Status"
+          tags:
+            - { tag: component, value: controller }
 
         - uuid: a8ea9b7a81c54c6faee48c5db9e5486d
           name: "SNMP agent: Stability counter"
@@ -916,6 +1010,23 @@ zabbix_export:
                 - { tag: component, value: pool }
                 - { tag: component, value: analytics }
 
+            - uuid: 1ae5b8b1b4dd499f8d5e23a5bdc8833b
+              name: "Pool {#POOLINDEX}: Read IOPS (trend)"
+              type: DEPENDENT
+              key: "qnap.pool.iops.read.trend[{#POOLINDEX}]"
+              master_item:
+                key: "qnap.pool.iops.read[{#POOLINDEX}]"
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      // Compute 1-hour trend average
+                      var trend = Trend.avg(value, 3600);
+                      return trend;
+              tags:
+                - { tag: component, value: pool }
+
           trigger_prototypes:
             - uuid: e3b7c9a14f8d4e0c9d2a6b5f1c7e40bd
               name: "Pool {#POOLINDEX}: Free space is below threshold"
@@ -1133,6 +1244,24 @@ zabbix_export:
                 - { tag: component, value: health }
                 - { tag: temp_group, value: "{#TEMP_GROUP}" }
 
+            - uuid: 760e9bd522d043c2bd74f5b9fb9b737e
+              name: "{#TSNAME}: Temperature anomaly score"
+              type: DEPENDENT
+              key: "qnap.temp.anomaly[{#TSINDEX}]"
+              master_item:
+                key: "qnap.temp.value[{#TSINDEX}]"
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var current = value;
+                      var trend = Number(Trend.avg(current, 3600));
+                      return Math.abs(current - trend);
+              tags:
+                - { tag: component, value: temperature }
+                - { tag: temp_group, value: "{#TEMP_GROUP}" }
+
           trigger_prototypes:
             - uuid: 550e8400e29b41d4a71644665544a03a
               name: "{#TSNAME}: Temperature is above CPU alarm threshold"
@@ -1141,6 +1270,13 @@ zabbix_export:
               tags:
                 - { tag: component, value: temperature }
                 - { tag: scope, value: availability }
+
+            - uuid: 92a49977e20a42a08dccd43ffdcfae40
+              name: "{#TSNAME}: Temperature anomaly detected"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.temp.anomaly[{#TSINDEX}])>5"
+              priority: WARNING
+              tags:
+                - { tag: component, value: temperature }
 
         - uuid: d4aeac9dae5d4afc8b79446e0f39f6ef
           name: "System Health Discovery"
@@ -1208,6 +1344,33 @@ zabbix_export:
               tags:
                 - { tag: component, value: pcie }
                 - { tag: component, value: hardware }
+
+            - uuid: 332c6e61740440fa987fa1b67d009d8d
+              name: "PCIe {#PCIEINDEX}: Link Speed"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.50.1.3.{#PCIEINDEX}"
+              key: "qnap.pcie.speed[{#PCIEINDEX}]"
+              tags:
+                - { tag: component, value: pcie }
+
+            - uuid: 7b846d3f48ac45b6893f5265ba0f9257
+              name: "PCIe {#PCIEINDEX}: Link Width"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.50.1.4.{#PCIEINDEX}"
+              key: "qnap.pcie.width[{#PCIEINDEX}]"
+              tags:
+                - { tag: component, value: pcie }
+
+            - uuid: 21eae647dfdb46198e61904039c78055
+              name: "PCIe {#PCIEINDEX}: Health State"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.50.1.5.{#PCIEINDEX}"
+              key: "qnap.pcie.health[{#PCIEINDEX}]"
+              valuemap:
+                name: "Health Status"
+              tags:
+                - { tag: component, value: pcie }
+
           trigger_prototypes:
             - uuid: 5ca3826443ca4e00bae5bfbe68d0eae3
               name: "PCIe {#PCIENAME}: Hardware issue detected"
@@ -1216,6 +1379,13 @@ zabbix_export:
               tags:
                 - { tag: component, value: pcie }
                 - { tag: scope, value: availability }
+
+            - uuid: 72b7fcd88dc24021bafe8a1ce734fe4c
+              name: "PCIe {#PCIEINDEX}: Link degraded"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.pcie.health[{#PCIEINDEX}])<>1"
+              priority: WARNING
+              tags:
+                - { tag: component, value: pcie }
 
         - uuid: 8a9dd23e55dd4c4db050e71c2b8f5c8c
           name: "QNAP App Discovery"
@@ -1309,6 +1479,7 @@ zabbix_export:
             - { value: "0", newvalue: "Normal" }
             - { value: "1", newvalue: "Warning" }
             - { value: "2", newvalue: "Critical" }
+
         - uuid: 550e8400e29b41d4a71644665544a041
           name: "Alarm state"
           mappings:
@@ -1331,6 +1502,7 @@ zabbix_export:
             - { value: "2", newvalue: "Rebuilding" }
             - { value: "3", newvalue: "Degraded" }
             - { value: "4", newvalue: "Crashed" }
+
         - uuid: 550e8400e29b41d4a71644665544a044
           name: "Health Status"
           mappings:
@@ -1347,11 +1519,13 @@ zabbix_export:
             - { value: "2", newvalue: "On battery" }
             - { value: "3", newvalue: "Low battery" }
             - { value: "4", newvalue: "Failure" }
+
         - uuid: 550e8400e29b41d4a71644665544a046
           name: "System On/Off"
           mappings:
             - { value: "0", newvalue: "Off" }
             - { value: "1", newvalue: "On" }
+
         - uuid: 550e8400e29b41d4a71644665544b200
           name: "IF-MIB Operational Status"
           mappings:
@@ -1362,3 +1536,13 @@ zabbix_export:
             - { value: "5", newvalue: "Dormant" }
             - { value: "6", newvalue: "NotPresent" }
             - { value: "7", newvalue: "LowerLayerDown" }
+
+        - uuid: a1504d0fc3474259a10fb4285ac698e4
+          name: "Controller Role"
+          mappings:
+            - value: "1"
+              newvalue: "Controller A (Active)"
+            - value: "2"
+              newvalue: "Controller B (Standby)"
+            - value: "3"
+              newvalue: "Unknown / Error"
