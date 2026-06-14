@@ -10,33 +10,38 @@ zabbix_export:
   templates:
     - uuid: 605f422e65104122b30db8c336da0a16
       template: "QNAP NAS LLD SNMP"
-      name: "QNAP NAS LLD SNMP v0.4.0"
+      name: "QNAP NAS LLD SNMP v0.6.0"
       description: |
         Production‑ready SNMP Low‑Level Discovery (LLD) template for QNAP NAS storage devices.
-        Version: 0.4.0
+        Version: 0.6.0
         Author: Majid Abdollahi
 
         This template provides complete, multi‑layer monitoring coverage for QNAP NAS systems using
         native SNMP OIDs, with full automatic discovery of disks, RAID groups, storage pools, volumes,
-        fans, temperature sensors (with grouping), PSUs, UPS units, PCIe devices, BBU modules, and
-        system health indicators. It is fully aligned with the Zabbix 7.4 YAML schema and validated
-        for compatibility with Zabbix 8.x.
+        fans, temperature sensors (with grouping), PSUs, UPS units, PCIe devices, BBU modules, NVMe
+        devices, and system health indicators. It is fully aligned with the Zabbix 7.4 YAML schema and
+        validated for compatibility with Zabbix 8.x.
 
         Core Features:
           • Automatic discovery of all major QNAP hardware components (HDDs, RAID groups, pools,
-            volumes, fans, PSUs, UPS, temperature sensors, PCIe cards, BBU modules, system health)
+            volumes, fans, PSUs, UPS, temperature sensors, PCIe cards, BBU modules, NVMe devices,
+            system health)
           • Real‑time monitoring of CPU, memory, uptime, firmware version, SNMP agent availability,
             and system identity
           • Storage‑focused metrics including capacity, free space, utilization percentage, IOPS,
-            throughput, and temperature for each disk, pool, and volume
-          • RAID group status monitoring with valuemap‑based state interpretation and rebuild visibility
+            throughput, temperature, wear‑leveling, and remaining‑life metrics for each disk
+          • RAID group status monitoring with valuemap‑based state interpretation, rebuild visibility,
+            and rebuild ETA estimation
           • Fan speed and health monitoring with alarm‑state mapping
           • Temperature sensor discovery with per‑sensor thresholds, grouping (CPU/System/HDD/Ambient),
-            and alerting
+            trend‑based averaging, and drift detection
           • UPS, PSU, NVMe, SSD cache, and BBU health monitoring for enterprise‑grade reliability
           • Dual‑controller awareness (role/failover) and PCIe link health for enterprise chassis
 
         Advanced Monitoring:
+          • Predictive disk‑failure scoring using temperature, wear‑leveling, and remaining‑life metrics
+          • NVMe endurance tracking (TBW, remaining endurance %)
+          • RAID rebuild ETA calculation using short‑term trend analysis
           • Threshold‑based alerting for HDD temperature (warning/critical)
           • Pool and volume free‑space alarms with customizable thresholds
           • RAID degradation and failure detection
@@ -49,17 +54,17 @@ zabbix_export:
             unexpected reboot detection, and system event log visibility
           • SLA‑oriented metrics for availability, performance, and capacity with dedicated triggers
           • Fleet‑level capacity and RAID health aggregation across multiple NAS units
-          • Trend‑based analytics for IOPS, throughput, and temperature anomalies
+          • Trend‑based analytics for IOPS, throughput, temperature, and thermal drift anomalies
 
         Template Architecture:
           • Fully LLD‑driven storage, hardware, service, and security monitoring — no manual configuration required
           • Clean separation of static system items and dynamic LLD components
           • Optimized polling intervals for performance‑critical vs. slow‑changing metrics
           • Native Zabbix valuemap support for RAID, PSU, UPS, fan, health, alarm state, security,
-            SLA state, PCIe link state, and controller role
+            SLA state, PCIe link state, controller role, and NVMe endurance
           • Consistent naming, tagging, and key structure for dashboards, filtering, SLA views,
             fleet‑level analytics, and multi‑NAS reporting
-          • Predictive analytics for pool/volume capacity exhaustion and trend‑based forecasting
+          • Predictive analytics for disk health, RAID rebuild forecasting, and temperature trend analysis
 
         Intended Use:
           • Suitable for all QNAP NAS models supporting SNMP v2/v3
@@ -858,15 +863,16 @@ zabbix_export:
         - uuid: 3a3b403389af46b3b93cd6bd4ed96ac8
           name: "Disk Discovery"
           type: SNMP_AGENT
-          snmp_oid: "discovery[{#HDDINDEX},1.3.6.1.4.1.55062.1.10.2.1.1,{#HDDSLOT},1.3.6.1.4.1.55062.1.10.2.1.2]"
           key: qnap.disk.discovery
+          snmp_oid: "discovery[{#HDDINDEX},1.3.6.1.4.1.55062.1.10.2.1.1,{#HDDSLOT},1.3.6.1.4.1.55062.1.10.2.1.2]"
           delay: 15m
+
           item_prototypes:
             - uuid: f4c7b9e12d8a4f0c9b3e6d5a1c7f2e64
               name: "HDD {#HDDSLOT}: Capacity"
               type: SNMP_AGENT
               snmp_oid: "1.3.6.1.4.1.55062.1.10.2.1.9.{#HDDINDEX}"
-              key: "qnap.disk.capacity[{#HDDINDEX}]"
+              key: qnap.disk.capacity[{#HDDINDEX}]
               delay: 1h
               units: B
               tags:
@@ -876,7 +882,7 @@ zabbix_export:
               name: "HDD {#HDDSLOT}: Temperature"
               type: SNMP_AGENT
               snmp_oid: "1.3.6.1.4.1.55062.1.10.2.1.8.{#HDDINDEX}"
-              key: "qnap.disk.temp[{#HDDINDEX}]"
+              key: qnap.disk.temp[{#HDDINDEX}]
               delay: 5m
               units: C
               tags:
@@ -887,12 +893,50 @@ zabbix_export:
               name: "HDD {#HDDSLOT}: State"
               type: SNMP_AGENT
               snmp_oid: "1.3.6.1.4.1.55062.1.10.2.1.7.{#HDDINDEX}"
-              key: "qnap.disk.state[{#HDDINDEX}]"
+              key: qnap.disk.state[{#HDDINDEX}]
               delay: 5m
               value_type: CHAR
               tags:
                 - { tag: component, value: disk }
                 - { tag: component, value: health }
+
+            - uuid: fbff4f1c2e7f4fd787d8f534ac31fec3
+              name: "Disk {#HDDSLOT}: Wear Leveling Count"
+              type: SNMP_AGENT
+              key: qnap.disk.wear[{#HDDINDEX}]
+              snmp_oid: .1.3.6.1.4.1.24681.1.2.17.1.1.{#HDDINDEX}
+              delay: 5m
+              tags:
+                - { tag: component, value: disk }
+
+            - uuid: a63c33b69d4245aab0eef2a0a6650d34
+              name: "Disk {#HDDSLOT}: Remaining Life (%)"
+              type: SNMP_AGENT
+              key: qnap.disk.life[{#HDDINDEX}]
+              snmp_oid: .1.3.6.1.4.1.24681.1.2.17.1.2.{#HDDINDEX}
+              delay: 5m
+              tags:
+                - { tag: component, value: disk }
+
+            - uuid: 29ae42ad9dc24887b3623afc9053b7ac
+              name: "Disk {#HDDSLOT}: Predictive Failure Score"
+              type: DEPENDENT
+              key: qnap.disk.predict[{#HDDINDEX}]
+              master_item:
+                key: qnap.disk.temp[{#HDDINDEX}]
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var temp = Number(value);
+                      var life = Number(Trend.avg(getValue("qnap.disk.life[{#HDDINDEX}]"), 3600));
+                      var wear = Number(getValue("qnap.disk.wear[{#HDDINDEX}]"));
+                      var score = (temp * 0.4) + ((100 - life) * 0.4) + (wear * 0.2);
+                      return score;
+              tags:
+                - { tag: component, value: disk }
+
           trigger_prototypes:
             - uuid: 550e8400e29b41d4a71644665544a034
               name: "HDD {#HDDSLOT}: Temperature is above warning threshold"
@@ -909,6 +953,53 @@ zabbix_export:
               tags:
                 - { tag: component, value: disk }
                 - { tag: scope, value: availability }
+
+            - uuid: 50f16f9666864bcbbcf64ea0010acc8b
+              name: "Disk {#HDDSLOT}: Predictive failure risk high"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.disk.predict[{#HDDINDEX}])>70"
+              priority: HIGH
+              tags:
+                - { tag: component, value: disk }
+
+            - uuid: 02f3cd2f1a1f429f9b513405a9ce215c
+              name: "Disk {#HDDSLOT}: Predictive health degraded"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.disk.predict[{#HDDINDEX}])>70"
+              priority: WARNING
+              tags:
+                - { tag: component, value: sla }
+
+        - uuid: 0e0c27bbe50b470a98c37b1067835ca0
+          name: "NVMe Discovery"
+          type: SNMP_AGENT
+          key: qnap.nvme.discovery
+          snmp_oid: .1.3.6.1.4.1.24681.1.2.18.1.1
+          delay: 1h
+          item_prototypes:
+            - uuid: 5030b474ca15499686a879ab087f1731
+              name: "NVMe {#NVMEINDEX}: TBW Used"
+              type: SNMP_AGENT
+              key: qnap.nvme.tbw[{#NVMEINDEX}]
+              snmp_oid: .1.3.6.1.4.1.24681.1.2.18.1.3.{#NVMEINDEX}
+              delay: 5m
+              tags:
+                - { tag: component, value: nvme }
+
+            - uuid: fe72fc536f9642c8adfba9d3166429b1
+              name: "NVMe {#NVMEINDEX}: Endurance Remaining (%)"
+              type: SNMP_AGENT
+              key: qnap.nvme.endurance[{#NVMEINDEX}]
+              snmp_oid: .1.3.6.1.4.1.24681.1.2.18.1.4.{#NVMEINDEX}
+              delay: 5m
+              tags:
+                - { tag: component, value: nvme }
+
+          trigger_prototypes:
+            - uuid: aa1fe48c277e4ca9adc22f71aa0d565c
+              name: "NVMe {#NVMEINDEX}: Endurance below 10%"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.nvme.endurance[{#NVMEINDEX}])<10"
+              priority: HIGH
+              tags:
+                - { tag: component, value: nvme }
 
         - uuid: a4c5377b77494114872cf01af603dccc
           name: "Pool Discovery"
@@ -1168,6 +1259,34 @@ zabbix_export:
                 - { tag: component, value: raid }
                 - { tag: component, value: performance }
 
+            - uuid: abf03a9600fa4da8b252b9147e2c1181
+              name: "RAID {#RAIDINDEX}: Rebuild Progress (%)"
+              type: SNMP_AGENT
+              key: qnap.raid.rebuild.progress[{#RAIDINDEX}]
+              snmp_oid: .1.3.6.1.4.1.24681.1.2.15.1.7.{#RAIDINDEX}
+              delay: 1m
+              tags:
+                - { tag: component, value: raid }
+
+            - uuid: a07aa2069dad4295a5238d263a951137
+              name: "RAID {#RAIDINDEX}: Rebuild ETA (minutes)"
+              type: DEPENDENT
+              key: qnap.raid.rebuild.eta[{#RAIDINDEX}]
+              master_item:
+                key: qnap.raid.rebuild.progress[{#RAIDINDEX}]
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var progress = Number(value);
+                      if (progress <= 0) return 0;
+                      var rate = Trend.avg(progress, 600); // 10-minute trend
+                      if (rate <= 0) return 0;
+                      return Math.round((100 - progress) / rate);
+              tags:
+                - { tag: component, value: raid }
+
           trigger_prototypes:
             - uuid: 478d3d31f6af4e83a316342dce98bd2a
               name: "RAID Group {#RGINDEX}: Status is not optimal"
@@ -1184,6 +1303,13 @@ zabbix_export:
               tags:
                 - { tag: component, value: raid }
                 - { tag: scope, value: maintenance }
+
+            - uuid: 8fc8d474969e4840ab546ffceba868c4
+              name: "RAID {#RAIDINDEX}: Rebuild ETA exceeds 24 hours"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.raid.rebuild.eta[{#RAIDINDEX}])>1440"
+              priority: WARNING
+              tags:
+                - { tag: component, value: raid }
 
         - uuid: 6f7bbcc3316b4a1b9e372e6f8f4160f6
           name: "PSU Discovery"
@@ -1262,6 +1388,22 @@ zabbix_export:
                 - { tag: component, value: temperature }
                 - { tag: temp_group, value: "{#TEMP_GROUP}" }
 
+            - uuid: d650b6aeeed8408dbe6eca6314f880be
+              name: "{#TSNAME}: Temperature Trend (1h)"
+              type: DEPENDENT
+              key: qnap.temp.trend[{#TSINDEX}]
+              master_item:
+                key: qnap.temp.value[{#TSINDEX}]
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      return Trend.avg(value, 3600);
+              tags:
+                - { tag: component, value: temperature }
+                - { tag: temp_group, value: "{#TEMP_GROUP}" }
+
           trigger_prototypes:
             - uuid: 550e8400e29b41d4a71644665544a03a
               name: "{#TSNAME}: Temperature is above CPU alarm threshold"
@@ -1274,6 +1416,13 @@ zabbix_export:
             - uuid: 92a49977e20a42a08dccd43ffdcfae40
               name: "{#TSNAME}: Temperature anomaly detected"
               expression: "last(/QNAP NAS LLD SNMP/qnap.temp.anomaly[{#TSINDEX}])>5"
+              priority: WARNING
+              tags:
+                - { tag: component, value: temperature }
+
+            - uuid: 848d02b118e2442dad9932eab8b7ece0
+              name: "{#TSNAME}: Temperature drift > 10°C in 1 hour"
+              expression: "abs(last(/QNAP NAS LLD SNMP/qnap.temp.value[{#TSINDEX}]) - last(/QNAP NAS LLD SNMP/qnap.temp.trend[{#TSINDEX}]))>10"
               priority: WARNING
               tags:
                 - { tag: component, value: temperature }
@@ -1546,3 +1695,13 @@ zabbix_export:
               newvalue: "Controller B (Standby)"
             - value: "3"
               newvalue: "Unknown / Error"
+
+        - uuid: 4959158e6fbd4f75aae18bace42fa33d
+          name: "Disk Remaining Life"
+          mappings:
+            - value: "100"
+              newvalue: "New"
+            - value: "50"
+              newvalue: "Mid-life"
+            - value: "10"
+              newvalue: "Critical"
