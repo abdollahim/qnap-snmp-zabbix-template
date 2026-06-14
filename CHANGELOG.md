@@ -217,3 +217,44 @@ forecasting capacity exhaustion and tracking real‑time storage performance.
 
 ### Notes
 This release completes the transition from a basic hardware template to a full‑stack QNAP monitoring suite, covering hardware, storage, services, security, performance, and predictive analytics. Version 0.2.0 is the first production‑grade, fully comprehensive release.
+
+---
+
+## [0.3.0] — Security, Integrity & System Health Expansion
+
+### Added — Security Monitoring Layer
+- Failed login attempt LLD (per‑source aggregation where possible)
+- Trigger for excessive failed login bursts (intrusion detection)
+- Admin password age monitoring (if OID supported)
+- Malware scan result monitoring (extended states)
+- Antivirus engine status (enabled/disabled, last scan time)
+- Firmware integrity deep‑check (extended OIDs)
+- System event log LLD (experimental; model‑dependent)
+- Alerts for suspicious activity:
+  - Unexpected reboots
+  - Firmware mismatch
+  - Repeated authentication failures
+  - Security module health degradation
+
+### Added — System Health Enhancements
+- System health module LLD improvements
+- Temperature sensor grouping (CPU / System / HDD / Ambient)
+- Health state correlation triggers (multi‑sensor abnormality detection)
+- SNMP agent stability tracking (flapping detection)
+
+### Improved — Reliability & Observability
+- Normalized security‑related tags across all prototypes
+- Improved trigger severity mapping for security events
+- Enhanced firmware update detection logic
+- Better separation of security vs. hardware alerts
+- Optimized polling intervals for security‑sensitive metrics
+
+### Internal Improvements
+- UUIDv4 regeneration for all new LLD components
+- Cleanup of legacy security OIDs
+- Improved YAML schema alignment for Zabbix 7.4+
+- Verified compatibility with Zabbix 8.x security modules
+
+### Notes
+This release elevates the template into a **security‑aware monitoring suite**, enabling early detection of intrusion attempts, firmware tampering, malware activity, and system instability.  
+Version 0.3.0 lays the foundation for enterprise‑grade security analytics and prepares the template for the dashboard‑focused enhancements in v0.4.0.
