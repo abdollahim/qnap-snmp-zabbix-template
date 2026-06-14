@@ -2,18 +2,18 @@ zabbix_export:
   version: "7.4"
 
   template_groups:
-    - uuid: 550e8400e29b41d4a71644665544a001
+    - uuid: f2587d2720d6454eaea6f1aafb3d1c06
       name: "Templates/Network devices"
 
   hosts: []
 
   templates:
-    - uuid: 550e8400e29b41d4a71644665544a002
+    - uuid: 605f422e65104122b30db8c336da0a16
       template: "QNAP NAS LLD SNMP"
-      name: "QNAP NAS LLD SNMP v0.1.0"
+      name: "QNAP NAS LLD SNMP v0.2.0"
       description: |
         Production‑ready SNMP Low‑Level Discovery (LLD) template for QNAP NAS storage devices.
-        Version: 0.1.0
+        Version: 0.2.0
         Author: Majid Abdollahi
 
         This template provides complete, multi‑layer monitoring coverage for QNAP NAS systems using
@@ -82,7 +82,7 @@ zabbix_export:
           value: "HDD"
 
       items:
-        - uuid: 550e8400e29b41d4a71644665544a009
+        - uuid: e64e82d558974465afe739223978ffd1
           name: "CPU temperature"
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.24681.1.3.5.0
@@ -92,7 +92,7 @@ zabbix_export:
           tags:
             - { tag: component, value: system }
 
-        - uuid: 550e8400e29b41d4a71644665544a00a
+        - uuid: a7a4f77534aa46e2a25ba5be691a4103
           name: "CPU: Temperature"
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.24681.1.4.1.1.1.1.4.2.0
@@ -102,7 +102,7 @@ zabbix_export:
           tags:
             - { tag: component, value: system }
           triggers:
-            - uuid: 550e8400e29b41d4a71644665544a03f
+            - uuid: e75a7e201e484aacb3decbce3d37bdac
               name: "System: High temperature detected"
               expression: "last(/QNAP NAS LLD SNMP/qnap.cpu.temp)>{$SYSTEM_TEMPERATURE_ALARM}"
               priority: HIGH
@@ -110,7 +110,7 @@ zabbix_export:
                 - { tag: component, value: temperature }
                 - { tag: scope, value: availability }
 
-        - uuid: 550e8400e29b41d4a71644665544a00b
+        - uuid: 7842ef24c95a40d199583ff2ff605281
           name: "CPU: Usage"
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.24681.1.3.1.0
@@ -120,7 +120,7 @@ zabbix_export:
           tags:
             - { tag: component, value: system }
           triggers:
-            - uuid: 550e8400e29b41d4a71644665544a03d
+            - uuid: 86e2a82bc61c46538284a7f395006b51
               name: "System: CPU usage is too high"
               expression: "last(/QNAP NAS LLD SNMP/qnap.cpu.usage)>90"
               priority: WARNING
@@ -128,7 +128,7 @@ zabbix_export:
                 - { tag: component, value: cpu }
                 - { tag: scope, value: performance }
 
-        - uuid: 550e8400e29b41d4a71644665544f030
+        - uuid: 803123f2121b4d2ab686692130b327a0
           name: "CPU: Load average (1m)"
           type: SNMP_AGENT
           snmp_oid: "1.3.6.1.4.1.55062.1.3.10.1.0"
@@ -137,7 +137,7 @@ zabbix_export:
           tags:
             - { tag: component, value: cpu }
 
-        - uuid: 550e8400e29b41d4a71644665544f031
+        - uuid: 3bd647b4eb6e4b549e0ad913fbee4556
           name: "CPU: Load average (5m)"
           type: SNMP_AGENT
           snmp_oid: "1.3.6.1.4.1.55062.1.3.10.2.0"
@@ -146,7 +146,7 @@ zabbix_export:
           tags:
             - { tag: component, value: cpu }
 
-        - uuid: 550e8400e29b41d4a71644665544f032
+        - uuid: f856613c78214f09a3fb43517b88c04a
           name: "CPU: Load average (15m)"
           type: SNMP_AGENT
           snmp_oid: "1.3.6.1.4.1.55062.1.3.10.3.0"
@@ -155,7 +155,7 @@ zabbix_export:
           tags:
             - { tag: component, value: cpu }
 
-        - uuid: 550e8400e29b41d4a71644665544a00c
+        - uuid: 2a7f02cdbbb94301a719d3d47aba86cb
           name: "System: Total memory"
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.24681.1.3.2.0
@@ -165,7 +165,7 @@ zabbix_export:
           tags:
             - { tag: component, value: system }
 
-        - uuid: 550e8400e29b41d4a71644665544a00d
+        - uuid: 4e46ef6fe0d24f49968a526a6782c428
           name: "System: Free memory"
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.24681.1.3.3.0
@@ -177,7 +177,7 @@ zabbix_export:
           tags:
             - { tag: component, value: system }
 
-        - uuid: 550e8400e29b41d4a71644665544a00e
+        - uuid: e084f51d49724f53915ee24fafe46176
           name: "System: Free memory (%)"
           type: CALCULATED
           key: qnap.mem.free.pct
@@ -188,7 +188,7 @@ zabbix_export:
           tags:
             - { tag: component, value: system }
           triggers:
-            - uuid: 550e8400e29b41d4a71644665544a03c
+            - uuid: 3f70a1a09a3c4d32bbc9c2b6ccf78b73
               name: "System: Free memory is too low"
               expression: "last(/QNAP NAS LLD SNMP/qnap.mem.free.pct)<{$MEMORY_FREE_ALARM}"
               priority: WARNING
@@ -196,7 +196,7 @@ zabbix_export:
                 - { tag: component, value: system }
                 - { tag: scope, value: capacity }
 
-        - uuid: 550e8400e29b41d4a71644665544e001
+        - uuid: 36cfce1050a44ecfbcfd2eebb64f1570
           name: "NVMe Cache: Health status"
           type: SNMP_AGENT
           snmp_oid: "1.3.6.1.4.1.55062.1.50.1.1.0"
@@ -208,7 +208,7 @@ zabbix_export:
             - { tag: component, value: nvme }
             - { tag: component, value: cache }
           triggers:
-            - uuid: 550e8400e29b41d4a71644665544e002
+            - uuid: 475ff9f9177947f6a9d0952f189d29f8
               name: "NVMe Cache: Health issue detected"
               expression: "last(/QNAP NAS LLD SNMP/qnap.nvme.health)<>1"
               priority: HIGH
@@ -216,7 +216,7 @@ zabbix_export:
                 - { tag: component, value: nvme }
                 - { tag: scope, value: availability }
 
-        - uuid: 550e8400e29b41d4a71644665544e010
+        - uuid: 7a94f638e8504952893f46209e2f4512
           name: "SSD Cache: Wear level (%)"
           type: SNMP_AGENT
           snmp_oid: "1.3.6.1.4.1.55062.1.50.2.1.0"
@@ -227,7 +227,7 @@ zabbix_export:
             - { tag: component, value: ssd }
             - { tag: component, value: cache }
           triggers:
-            - uuid: 550e8400e29b41d4a71644665544e011
+            - uuid: 063273376dda4d7a9f9a196e756b60bc
               name: "SSD Cache: Wear level critical"
               expression: "last(/QNAP NAS LLD SNMP/qnap.ssd.wear)>80"
               priority: HIGH
@@ -235,7 +235,66 @@ zabbix_export:
                 - { tag: component, value: ssd }
                 - { tag: scope, value: capacity }
 
-        - uuid: 550e8400e29b41d4a71644665544e020
+        - uuid: 39d1df742346484da6828fdbb3dfa493
+          name: "Snapshots: Space used (%)"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.80.1.1.0"
+          key: qnap.snapshots.used.pct
+          delay: 10m
+          units: "%"
+          tags:
+            - { tag: component, value: snapshot }
+            - { tag: component, value: storage }
+          triggers:
+            - uuid: dee364c810d84e14a0583e58a8cd383e
+              name: "Snapshots: Space usage high"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.snapshots.used.pct)>80"
+              priority: HIGH
+              tags:
+                - { tag: component, value: snapshot }
+                - { tag: scope, value: capacity }
+
+        - uuid: 107f30d0295f427f8f3374f4d99c2e18
+          name: "Replication: Last job status"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.100.1.1.0"
+          key: qnap.replication.status
+          delay: 10m
+          valuemap:
+            name: "Alarm state"
+          tags:
+            - { tag: component, value: replication }
+            - { tag: component, value: backup }
+          triggers:
+            - uuid: 14e78c20ee9c4c2a9776a4c4d984a7a2
+              name: "Replication: Last job failed"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.replication.status)=2"
+              priority: HIGH
+              tags:
+                - { tag: component, value: replication }
+                - { tag: scope, value: availability }
+
+        - uuid: 042feb89d0a84471b56273f6ecd76f68
+          name: "Antivirus: Engine status"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.110.1.1.0"
+          key: qnap.antivirus.status
+          delay: 10m
+          valuemap:
+            name: "System On/Off"
+          tags:
+            - { tag: component, value: antivirus }
+            - { tag: component, value: security }
+          triggers:
+            - uuid: 9f075936fbde4db8b19dbd4b36fa4450
+              name: "Antivirus: Engine is disabled"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.antivirus.status)=0"
+              priority: WARNING
+              tags:
+                - { tag: component, value: antivirus }
+                - { tag: scope, value: security }
+
+        - uuid: d7cdeec72509409a83f554f35bda0ddc
           name: "BBU: Status"
           type: SNMP_AGENT
           snmp_oid: "1.3.6.1.4.1.55062.1.50.3.1.0"
@@ -247,7 +306,7 @@ zabbix_export:
             - { tag: component, value: bbu }
             - { tag: component, value: cache }
           triggers:
-            - uuid: 550e8400e29b41d4a71644665544e021
+            - uuid: 62b52ffe3ed044f7895d73feb41fb3ab
               name: "BBU: Failure detected"
               expression: "last(/QNAP NAS LLD SNMP/qnap.bbu.status)<>1"
               priority: HIGH
@@ -255,7 +314,7 @@ zabbix_export:
                 - { tag: component, value: bbu }
                 - { tag: scope, value: availability }
 
-        - uuid: 550e8400e29b41d4a71644665544a00f
+        - uuid: cc1fa5918a65409db64b7cced02c6a93
           name: "System: Uptime"
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
@@ -267,7 +326,7 @@ zabbix_export:
           tags:
             - { tag: component, value: system }
 
-        - uuid: 550e8400e29b41d4a71644665544a010
+        - uuid: 4d0e4f136cd94f6489182a861cbfef1c
           name: "System: Hostname"
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.55062.1.12.4.0
@@ -278,7 +337,7 @@ zabbix_export:
           tags:
             - { tag: component, value: system }
 
-        - uuid: 550e8400e29b41d4a71644665544a011
+        - uuid: 0e898d890ac740af9bb747ed73404540
           name: "System: Serial no."
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.55062.1.12.5.0
@@ -289,7 +348,7 @@ zabbix_export:
           tags:
             - { tag: component, value: system }
 
-        - uuid: 550e8400e29b41d4a71644665544a012
+        - uuid: 264de4e4acc24dd98749fc797a190a3f
           name: "System: Firmware version"
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.55062.1.12.6.0
@@ -299,7 +358,7 @@ zabbix_export:
           tags:
             - { tag: component, value: system }
 
-        - uuid: 550e8400e29b41d4a71644665544a013
+        - uuid: cc3f2780e46e42df94e1fda63e111b8b
           name: "System: Firmware update available"
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.55062.1.12.7.0
@@ -311,7 +370,7 @@ zabbix_export:
             - { tag: component, value: system }
             - { tag: component, value: health }
           triggers:
-            - uuid: 550e8400e29b41d4a71644665544a050
+            - uuid: 1a0992ec7fbb4a3ab86d8c641f80f760
               name: "System: Firmware update available"
               expression: "last(/QNAP NAS LLD SNMP/qnap.system.fw.update.available)=1"
               priority: INFO
@@ -319,7 +378,7 @@ zabbix_export:
                 - { tag: component, value: system }
                 - { tag: scope, value: maintenance }
 
-        - uuid: 550e8400e29b41d4a71644665544d020
+        - uuid: 133f619e7b694ad0a36f40b2f6b7413d
           name: "Security: Firmware integrity status"
           type: SNMP_AGENT
           snmp_oid: "1.3.6.1.4.1.55062.1.40.2.1.0"
@@ -331,7 +390,7 @@ zabbix_export:
             - { tag: component, value: security }
             - { tag: component, value: firmware }
           triggers:
-            - uuid: 550e8400e29b41d4a71644665544d021
+            - uuid: bba7b42911dd499cb9fc861868dd6327
               name: "Security: Firmware integrity issue detected"
               expression: "last(/QNAP NAS LLD SNMP/qnap.security.fw.integrity)<>1"
               priority: HIGH
@@ -339,7 +398,7 @@ zabbix_export:
                 - { tag: component, value: security }
                 - { tag: scope, value: integrity }
 
-        - uuid: 550e8400e29b41d4a71644665544a014
+        - uuid: efebf11efc5f486dabecb5a045329ffb
           name: "SNMP agent availability"
           type: INTERNAL
           key: "zabbix[host,snmp,available]"
@@ -348,7 +407,7 @@ zabbix_export:
             - { tag: component, value: availability }
             - { tag: component, value: health }
           triggers:
-            - uuid: 550e8400e29b41d4a71644665544a03e
+            - uuid: fa6ecfbc30b94c3a9e8d981dfc3b6911
               name: "System: SNMP agent is unavailable"
               expression: "last(/QNAP NAS LLD SNMP/zabbix[host,snmp,available])=0"
               priority: HIGH
@@ -356,7 +415,7 @@ zabbix_export:
                 - { tag: component, value: availability }
                 - { tag: scope, value: connectivity }
 
-        - uuid: 550e8400e29b41d4a71644665544c001
+        - uuid: 5b0395c7e75f4c7c86f92133b96a99de
           name: "Service: SMB status"
           type: SNMP_AGENT
           snmp_oid: "1.3.6.1.4.1.55062.1.20.1.1.0"
@@ -368,7 +427,7 @@ zabbix_export:
             - { tag: component, value: service }
             - { tag: service, value: smb }
           triggers:
-            - uuid: 550e8400e29b41d4a71644665544c010
+            - uuid: d30bd6676ad14e8ab54a2d1b5e2dd9a4
               name: "Service: SMB is down"
               expression: "last(/QNAP NAS LLD SNMP/qnap.service.smb)=0"
               priority: HIGH
@@ -376,7 +435,7 @@ zabbix_export:
                 - { tag: component, value: service }
                 - { tag: scope, value: availability }
 
-        - uuid: 550e8400e29b41d4a71644665544c002
+        - uuid: 813682d5ad5747b8a3bbe61b1dea5559
           name: "Service: AFP status"
           type: SNMP_AGENT
           snmp_oid: "1.3.6.1.4.1.55062.1.20.1.2.0"
@@ -388,7 +447,7 @@ zabbix_export:
             - { tag: component, value: service }
             - { tag: service, value: afp }
 
-        - uuid: 550e8400e29b41d4a71644665544c003
+        - uuid: 5c4f8330c95f4f98b69aa182a88711a7
           name: "Service: NFS status"
           type: SNMP_AGENT
           snmp_oid: "1.3.6.1.4.1.55062.1.20.1.3.0"
@@ -400,7 +459,7 @@ zabbix_export:
             - { tag: component, value: service }
             - { tag: service, value: nfs }
           triggers:
-            - uuid: 550e8400e29b41d4a71644665544c011
+            - uuid: c517fb796cb44f1ea77dfed63bb4e154
               name: "Service: NFS is down"
               expression: "last(/QNAP NAS LLD SNMP/qnap.service.nfs)=0"
               priority: HIGH
@@ -408,7 +467,7 @@ zabbix_export:
                 - { tag: component, value: service }
                 - { tag: scope, value: availability }
 
-        - uuid: 550e8400e29b41d4a71644665544c004
+        - uuid: b2d636fcae2146e9809e6c602437b970
           name: "Service: FTP status"
           type: SNMP_AGENT
           snmp_oid: "1.3.6.1.4.1.55062.1.20.1.4.0"
@@ -420,7 +479,7 @@ zabbix_export:
             - { tag: component, value: service }
             - { tag: service, value: ftp }
           triggers:
-            - uuid: 550e8400e29b41d4a71644665544c012
+            - uuid: 19d06efc66344011aa8e001946ac2956
               name: "Service: FTP is down"
               expression: "last(/QNAP NAS LLD SNMP/qnap.service.ftp)=0"
               priority: WARNING
@@ -428,7 +487,7 @@ zabbix_export:
                 - { tag: component, value: service }
                 - { tag: scope, value: availability }
 
-        - uuid: 550e8400e29b41d4a71644665544c005
+        - uuid: 378a345ea45448e081c6e25b14289ffa
           name: "Service: SSH status"
           type: SNMP_AGENT
           snmp_oid: "1.3.6.1.4.1.55062.1.20.1.5.0"
@@ -440,7 +499,7 @@ zabbix_export:
             - { tag: component, value: service }
             - { tag: service, value: ssh }
           triggers:
-            - uuid: 550e8400e29b41d4a71644665544c013
+            - uuid: f23505da5ebb4d73b8c27c5b44edbc15
               name: "Service: SSH is down"
               expression: "last(/QNAP NAS LLD SNMP/qnap.service.ssh)=0"
               priority: HIGH
@@ -448,7 +507,7 @@ zabbix_export:
                 - { tag: component, value: service }
                 - { tag: scope, value: availability }
 
-        - uuid: 550e8400e29b41d4a71644665544c020
+        - uuid: cc1df56c006d401ba0cd0090d8c56ad6
           name: "System: Event log error count"
           type: SNMP_AGENT
           snmp_oid: "1.3.6.1.4.1.55062.1.30.1.1.0"
@@ -458,7 +517,7 @@ zabbix_export:
             - { tag: component, value: system }
             - { tag: component, value: health }
           triggers:
-            - uuid: 550e8400e29b41d4a71644665544c021
+            - uuid: 6290560509d34f65893ff1d212f9d367
               name: "System: New error events detected"
               expression: "change(/QNAP NAS LLD SNMP/qnap.system.event.errors)>0"
               priority: WARNING
@@ -466,7 +525,7 @@ zabbix_export:
                 - { tag: component, value: system }
                 - { tag: scope, value: health }
 
-        - uuid: 550e8400e29b41d4a71644665544d001
+        - uuid: d233a998cfce432cbf7060080a6a3a67
           name: "Security: Failed login attempts"
           type: SNMP_AGENT
           snmp_oid: "1.3.6.1.4.1.55062.1.40.1.1.0"
@@ -476,7 +535,7 @@ zabbix_export:
             - { tag: component, value: security }
             - { tag: scope, value: authentication }
           triggers:
-            - uuid: 550e8400e29b41d4a71644665544d002
+            - uuid: c9f3178053fe4319bb87e34afcdd7a3c
               name: "Security: Excessive failed login attempts detected"
               expression: "change(/QNAP NAS LLD SNMP/qnap.security.failed.logins)>5"
               priority: HIGH
@@ -484,7 +543,7 @@ zabbix_export:
                 - { tag: component, value: security }
                 - { tag: scope, value: intrusion }
 
-        - uuid: 550e8400e29b41d4a71644665544d010
+        - uuid: bb0db13a840049a69d441a48a4907673
           name: "System: Last boot time"
           type: SNMP_AGENT
           snmp_oid: "1.3.6.1.2.1.25.1.1.0"
@@ -497,7 +556,7 @@ zabbix_export:
             - { tag: component, value: system }
             - { tag: component, value: health }
           triggers:
-            - uuid: 550e8400e29b41d4a71644665544d011
+            - uuid: e2eda29350d04490bd70518ab895b219
               name: "System: Unexpected reboot detected"
               expression: "change(/QNAP NAS LLD SNMP/qnap.system.lastboot)<0"
               priority: WARNING
@@ -505,7 +564,7 @@ zabbix_export:
                 - { tag: component, value: system }
                 - { tag: scope, value: availability }
 
-        - uuid: 550e8400e29b41d4a71644665544d030
+        - uuid: 1ea1f7bee1424955a8407efa17d69228
           name: "Security: Malware scan result"
           type: SNMP_AGENT
           snmp_oid: "1.3.6.1.4.1.55062.1.40.3.1.0"
@@ -517,7 +576,7 @@ zabbix_export:
             - { tag: component, value: security }
             - { tag: component, value: antivirus }
           triggers:
-            - uuid: 550e8400e29b41d4a71644665544d031
+            - uuid: 5f0aac4f9f264c669227e3c3483e90fc
               name: "Security: Malware detected"
               expression: "last(/QNAP NAS LLD SNMP/qnap.security.malware.scan)=2"
               priority: DISASTER
@@ -526,7 +585,7 @@ zabbix_export:
                 - { tag: scope, value: threat }
 
       discovery_rules:
-        - uuid: 550e8400e29b41d4a71644665544b100
+        - uuid: 806b9add49e1409aa6111a43f08fc0ef
           name: "Network Interface LLD (IF-MIB)"
           type: SNMP_AGENT
           snmp_oid: "discovery[{#SNMPINDEX},1.3.6.1.2.1.2.2.1.1,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1]"
@@ -534,7 +593,7 @@ zabbix_export:
           delay: 30m
 
           item_prototypes:
-            - uuid: 550e8400e29b41d4a71644665544b101
+            - uuid: e475c87807df48d39315eb40c053e64e
               name: "Interface {#IFNAME}: Incoming traffic"
               type: SNMP_AGENT
               snmp_oid: "1.3.6.1.2.1.2.2.1.10.{#SNMPINDEX}"
@@ -547,7 +606,7 @@ zabbix_export:
               tags:
                 - { tag: component, value: network }
 
-            - uuid: 550e8400e29b41d4a71644665544b102
+            - uuid: e1a9c4b7d3f84a1c9b7e2d6f5c3a8e10
               name: "Interface {#IFNAME}: Outgoing traffic"
               type: SNMP_AGENT
               snmp_oid: "1.3.6.1.2.1.2.2.1.16.{#SNMPINDEX}"
@@ -560,7 +619,7 @@ zabbix_export:
               tags:
                 - { tag: component, value: network }
 
-            - uuid: 550e8400e29b41d4a71644665544b103
+            - uuid: d7e1b3c94f2a4e0c9a6d5f3b1c8e7a52
               name: "Interface {#IFNAME}: Operational status"
               type: SNMP_AGENT
               snmp_oid: "1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}"
@@ -572,7 +631,7 @@ zabbix_export:
                 - { tag: component, value: network }
 
           trigger_prototypes:
-            - uuid: 550e8400e29b41d4a71644665544b104
+            - uuid: 7c3e1b9d2f8a4c0e9b6d3f7a1c5e4b92
               name: "Interface {#IFNAME}: Link down"
               expression: "last(/QNAP NAS LLD SNMP/if.status[{#IFNAME}])<>1"
               priority: WARNING
@@ -580,7 +639,7 @@ zabbix_export:
                 - { tag: component, value: network }
                 - { tag: scope, value: availability }
 
-        - uuid: 550e8400e29b41d4a71644665544a018
+        - uuid: 8b6c14b4b2214b729181573df620a5a2
           name: "FAN Discovery"
           type: SNMP_AGENT
           snmp_oid: "discovery[{#FANINDEX},1.3.6.1.4.1.55062.1.12.9.1.1,{#FANNAME},1.3.6.1.4.1.55062.1.12.9.1.2]"
@@ -618,14 +677,14 @@ zabbix_export:
                 - { tag: component, value: system }
                 - { tag: scope, value: performance }
 
-        - uuid: 550e8400e29b41d4a71644665544a01b
+        - uuid: 3a3b403389af46b3b93cd6bd4ed96ac8
           name: "Disk Discovery"
           type: SNMP_AGENT
           snmp_oid: "discovery[{#HDDINDEX},1.3.6.1.4.1.55062.1.10.2.1.1,{#HDDSLOT},1.3.6.1.4.1.55062.1.10.2.1.2]"
           key: qnap.disk.discovery
           delay: 15m
           item_prototypes:
-            - uuid: 550e8400e29b41d4a71644665544a01c
+            - uuid: f4c7b9e12d8a4f0c9b3e6d5a1c7f2e64
               name: "HDD {#HDDSLOT}: Capacity"
               type: SNMP_AGENT
               snmp_oid: "1.3.6.1.4.1.55062.1.10.2.1.9.{#HDDINDEX}"
@@ -635,7 +694,7 @@ zabbix_export:
               tags:
                 - { tag: component, value: disk }
 
-            - uuid: 550e8400e29b41d4a71644665544a01d
+            - uuid: 9f3c7e1a4b8d4f0c9a2d6b5f1c7e3a91
               name: "HDD {#HDDSLOT}: Temperature"
               type: SNMP_AGENT
               snmp_oid: "1.3.6.1.4.1.55062.1.10.2.1.8.{#HDDINDEX}"
@@ -673,14 +732,14 @@ zabbix_export:
                 - { tag: component, value: disk }
                 - { tag: scope, value: availability }
 
-        - uuid: 550e8400e29b41d4a71644665544a01f
+        - uuid: a4c5377b77494114872cf01af603dccc
           name: "Pool Discovery"
           type: SNMP_AGENT
           snmp_oid: "discovery[{#POOLINDEX},1.3.6.1.4.1.55062.1.10.7.1.1]"
           key: qnap.pool.discovery
           delay: 15m
           item_prototypes:
-            - uuid: 550e8400e29b41d4a71644665544a020
+            - uuid: b462676fe0dd4e16b746eed9b1bff381
               name: "Pool {#POOLINDEX}: Capacity"
               type: SNMP_AGENT
               snmp_oid: "1.3.6.1.4.1.55062.1.10.7.1.3.{#POOLINDEX}"
@@ -690,7 +749,7 @@ zabbix_export:
               tags:
                 - { tag: component, value: pool }
 
-            - uuid: 550e8400e29b41d4a71644665544a021
+            - uuid: a595530310f84c43a3f51714108d21be
               name: "Pool {#POOLINDEX}: Free size"
               type: SNMP_AGENT
               snmp_oid: "1.3.6.1.4.1.55062.1.10.7.1.4.{#POOLINDEX}"
@@ -700,16 +759,16 @@ zabbix_export:
               tags:
                 - { tag: component, value: pool }
 
-            - uuid: 550e8400e29b41d4a71644665544a022
+            - uuid: b626ded28349449ca9c2a35b7d59bd8a
               name: "Pool {#POOLINDEX}: Free size in %"
               type: CALCULATED
               key: "qnap.pool.free.pct[{#POOLINDEX}]"
               delay: 15m
-              params: "last(//qnap.pool.free[{#POOLINDEX}])/last(//qnap.pool.capacity[{#POOLINDEX}])*100"
+              params: "last(//qnap.pool.free[{#POOLINDEX}]) / (last(//qnap.pool.capacity[{#POOLINDEX}]) / 100)"
               tags:
                 - { tag: component, value: pool }
 
-            - uuid: 550e8400e29b41d4a71644665544f001
+            - uuid: 9300c91bef9d480baa17533fcb6bae28
               name: "Pool {#POOLINDEX}: Read IOPS"
               type: SNMP_AGENT
               snmp_oid: "1.3.6.1.4.1.55062.1.10.7.1.10.{#POOLINDEX}"
@@ -722,7 +781,7 @@ zabbix_export:
                 - { tag: component, value: pool }
                 - { tag: component, value: performance }
 
-            - uuid: 550e8400e29b41d4a71644665544f002
+            - uuid: c0908d8db9da46498615cdb4ca816e91
               name: "Pool {#POOLINDEX}: Write IOPS"
               type: SNMP_AGENT
               snmp_oid: "1.3.6.1.4.1.55062.1.10.7.1.11.{#POOLINDEX}"
@@ -735,7 +794,7 @@ zabbix_export:
                 - { tag: component, value: pool }
                 - { tag: component, value: performance }
 
-            - uuid: 550e8400e29b41d4a71644665544f003
+            - uuid: e6ab69b97dad4a618ccace4299783eab
               name: "Pool {#POOLINDEX}: Read throughput"
               type: SNMP_AGENT
               snmp_oid: "1.3.6.1.4.1.55062.1.10.7.1.12.{#POOLINDEX}"
@@ -748,7 +807,7 @@ zabbix_export:
                 - { tag: component, value: pool }
                 - { tag: component, value: performance }
 
-            - uuid: 550e8400e29b41d4a71644665544f004
+            - uuid: d929940089ed47a189be4c9bc90c7584
               name: "Pool {#POOLINDEX}: Write throughput"
               type: SNMP_AGENT
               snmp_oid: "1.3.6.1.4.1.55062.1.10.7.1.13.{#POOLINDEX}"
@@ -761,7 +820,7 @@ zabbix_export:
                 - { tag: component, value: pool }
                 - { tag: component, value: performance }
 
-            - uuid: 550e8400e29b41d4a71644665544f020
+            - uuid: 9c7e1a3b5d4f4c0e8b2d6f5a1c7e50fa
               name: "Pool {#POOLINDEX}: Days until full"
               type: CALCULATED
               key: "qnap.pool.days.full[{#POOLINDEX}]"
@@ -774,7 +833,7 @@ zabbix_export:
                 - { tag: component, value: analytics }
 
           trigger_prototypes:
-            - uuid: 550e8400e29b41d4a71644665544a037
+            - uuid: e3b7c9a14f8d4e0c9d2a6b5f1c7e40bd
               name: "Pool {#POOLINDEX}: Free space is below threshold"
               expression: "last(/QNAP NAS LLD SNMP/qnap.pool.free.pct[{#POOLINDEX}])<{$POOL_SIZE_ALARM}"
               priority: WARNING
@@ -782,7 +841,7 @@ zabbix_export:
                 - { tag: component, value: pool }
                 - { tag: scope, value: capacity }
 
-            - uuid: 550e8400e29b41d4a71644665544f021
+            - uuid: 0ac46d514cd342e1aa2f62bfab6fecf4
               name: "Pool {#POOLINDEX}: Predicted to run out of space soon"
               expression: "last(/QNAP NAS LLD SNMP/qnap.pool.days.full[{#POOLINDEX}])<7"
               priority: WARNING
@@ -790,14 +849,14 @@ zabbix_export:
                 - { tag: component, value: pool }
                 - { tag: scope, value: capacity }
 
-        - uuid: 550e8400e29b41d4a71644665544a023
+        - uuid: 7e15fe743a3747e0be819108ff7e6017
           name: "Volume Discovery"
           type: SNMP_AGENT
           snmp_oid: "discovery[{#VOLINDEX},1.3.6.1.4.1.55062.1.10.8.1.1,{#VOLNAME},1.3.6.1.4.1.55062.1.10.8.1.2]"
           key: qnap.volume.discovery
           delay: 15m
           item_prototypes:
-            - uuid: 550e8400e29b41d4a71644665544a024
+            - uuid: 82a519148e63432fa2b6085fb333f1d2
               name: "Volume {#VOLNAME}: Capacity"
               type: SNMP_AGENT
               snmp_oid: "1.3.6.1.4.1.55062.1.10.8.1.3.{#VOLINDEX}"
@@ -807,7 +866,7 @@ zabbix_export:
               tags:
                 - { tag: component, value: volume }
 
-            - uuid: 550e8400e29b41d4a71644665544a025
+            - uuid: 1176ac4a90094ab9b39a347a5911f7fc
               name: "Volume {#VOLNAME}: Free size"
               type: SNMP_AGENT
               snmp_oid: "1.3.6.1.4.1.55062.1.10.8.1.4.{#VOLINDEX}"
@@ -817,7 +876,7 @@ zabbix_export:
               tags:
                 - { tag: component, value: volume }
 
-            - uuid: 550e8400e29b41d4a71644665544a026
+            - uuid: 72ded4c3b20e4ae888c6dd666890dc47
               name: "Volume {#VOLNAME}: Free size in %"
               type: CALCULATED
               key: "qnap.volume.free.pct[{#VOLINDEX}]"
@@ -826,7 +885,7 @@ zabbix_export:
               tags:
                 - { tag: component, value: volume }
 
-            - uuid: 550e8400e29b41d4a71644665544f022
+            - uuid: a0c683d6e64e4bde99ca8fdac2be8148
               name: "Volume {#VOLNAME}: Days until full"
               type: CALCULATED
               key: "qnap.volume.days.full[{#VOLINDEX}]"
@@ -847,7 +906,7 @@ zabbix_export:
                 - { tag: component, value: volume }
                 - { tag: scope, value: capacity }
 
-            - uuid: 550e8400e29b41d4a71644665544f023
+            - uuid: 6a829ed5f36a478895f6c2e1a8d4b907
               name: "Volume {#VOLNAME}: Predicted to run out of space soon"
               expression: "last(/QNAP NAS LLD SNMP/qnap.volume.days.full[{#VOLINDEX}])<7"
               priority: WARNING
@@ -855,14 +914,14 @@ zabbix_export:
                 - { tag: component, value: volume }
                 - { tag: scope, value: capacity }
 
-        - uuid: 550e8400e29b41d4a71644665544a027
+        - uuid: 03059240e1b94d9c8b900ab981c070fd
           name: "RAID Group Discovery"
           type: SNMP_AGENT
           snmp_oid: "discovery[{#RGINDEX},1.3.6.1.4.1.55062.1.10.6.1.1]"
           key: qnap.raid.discovery
           delay: 15m
           item_prototypes:
-            - uuid: 550e8400e29b41d4a71644665544a028
+            - uuid: bbb5356f0a404fe396ff5e5fa73b37f0
               name: "RAID Group {#RGINDEX}: Status"
               type: SNMP_AGENT
               snmp_oid: "1.3.6.1.4.1.55062.1.10.6.1.3.{#RGINDEX}"
@@ -874,7 +933,7 @@ zabbix_export:
                 - { tag: component, value: raid }
                 - { tag: component, value: health }
 
-            - uuid: 550e8400e29b41d4a71644665544a029
+            - uuid: 50398ab16f2246dbbadb6595e2b391d4
               name: "RAID Group {#RGINDEX}: Capacity"
               type: SNMP_AGENT
               snmp_oid: "1.3.6.1.4.1.55062.1.10.6.1.4.{#RGINDEX}"
@@ -903,7 +962,7 @@ zabbix_export:
               tags:
                 - { tag: component, value: raid }
 
-            - uuid: 550e8400e29b41d4a71644665544f010
+            - uuid: b1e0be2869d14c57a1260554db35a23b
               name: "RAID Group {#RGINDEX}: Rebuild progress (%)"
               type: SNMP_AGENT
               snmp_oid: "1.3.6.1.4.1.55062.1.10.6.1.6.{#RGINDEX}"
@@ -915,7 +974,7 @@ zabbix_export:
                 - { tag: component, value: performance }
 
           trigger_prototypes:
-            - uuid: 550e8400e29b41d4a71644665544a036
+            - uuid: 478d3d31f6af4e83a316342dce98bd2a
               name: "RAID Group {#RGINDEX}: Status is not optimal"
               expression: "last(/QNAP NAS LLD SNMP/qnap.raid.status[{#RGINDEX}])<>1"
               priority: HIGH
@@ -923,7 +982,7 @@ zabbix_export:
                 - { tag: component, value: raid }
                 - { tag: scope, value: availability }
 
-            - uuid: 550e8400e29b41d4a71644665544f011
+            - uuid: c6c16600dafc4b468068c36b00cf37ca
               name: "RAID Group {#RGINDEX}: Rebuild in progress"
               expression: "last(/QNAP NAS LLD SNMP/qnap.raid.rebuild.progress[{#RGINDEX}])>0"
               priority: INFO
@@ -931,7 +990,7 @@ zabbix_export:
                 - { tag: component, value: raid }
                 - { tag: scope, value: maintenance }
 
-        - uuid: 550e8400e29b41d4a71644665544a02c
+        - uuid: 6f7bbcc3316b4a1b9e372e6f8f4160f6
           name: "PSU Discovery"
           type: SNMP_AGENT
           snmp_oid: "discovery[{#PSUINDEX},1.3.6.1.4.1.55062.1.12.10.1.1]"
@@ -963,7 +1022,7 @@ zabbix_export:
                 - { tag: component, value: health }
 
           trigger_prototypes:
-            - uuid: 550e8400e29b41d4a71644665544a039
+            - uuid: fc0e6391b70d43648dd17561e53e036c
               name: "PSU {#PSUINDEX}: Failure detected"
               expression: "last(/QNAP NAS LLD SNMP/qnap.psu.status[{#PSUINDEX}])<>1"
               priority: HIGH
@@ -971,7 +1030,7 @@ zabbix_export:
                 - { tag: component, value: psu }
                 - { tag: scope, value: availability }
 
-        - uuid: 550e8400e29b41d4a71644665544a02e
+        - uuid: d88f629d86a6495fbe9cb2115cc683f9
           name: "Temperature Sensor Discovery"
           type: SNMP_AGENT
           snmp_oid: "discovery[{#TSINDEX},1.3.6.1.4.1.55062.1.12.8.1.1,{#TSNAME},1.3.6.1.4.1.55062.1.12.8.1.2]"
@@ -998,14 +1057,14 @@ zabbix_export:
                 - { tag: component, value: temperature }
                 - { tag: scope, value: availability }
 
-        - uuid: 550e8400e29b41d4a71644665544a030
+        - uuid: d4aeac9dae5d4afc8b79446e0f39f6ef
           name: "System Health Discovery"
           type: SNMP_AGENT
           snmp_oid: "discovery[{#HLTINDEX},1.3.6.1.4.1.55062.1.12.11.1.1,{#HLTNAME},1.3.6.1.4.1.55062.1.12.11.1.2]"
           key: qnap.health.discovery
           delay: 15m
           item_prototypes:
-            - uuid: 550e8400e29b41d4a71644665544a031
+            - uuid: 71dab2edac704f07b174223993cca57e
               name: "{#HLTNAME}: Status"
               type: SNMP_AGENT
               snmp_oid: "1.3.6.1.4.1.55062.1.12.11.1.3.{#HLTINDEX}"
@@ -1018,7 +1077,7 @@ zabbix_export:
                 - { tag: component, value: system }
 
           trigger_prototypes:
-            - uuid: 550e8400e29b41d4a71644665544a03b
+            - uuid: 0a32c733cf0f4b35917a8e1bea41b6dd
               name: "{#HLTNAME}: System health issue detected"
               expression: "last(/QNAP NAS LLD SNMP/qnap.health.status[{#HLTINDEX}])<>1"
               priority: HIGH
@@ -1026,14 +1085,14 @@ zabbix_export:
                 - { tag: component, value: health }
                 - { tag: scope, value: availability }
 
-        - uuid: 550e8400e29b41d4a71644665544a032
+        - uuid: fb0274eb2b304a019cd6794111882039
           name: "UPS Discovery"
           type: SNMP_AGENT
           snmp_oid: "discovery[{#UPSINDEX},1.3.6.1.4.1.55062.1.12.13.1.1]"
           key: qnap.ups.discovery
           delay: 15m
           item_prototypes:
-            - uuid: 550e8400e29b41d4a71644665544a033
+            - uuid: a795d4d66dc243fda8c296b955f22b18
               name: "UPS {#UPSINDEX}: Status"
               type: SNMP_AGENT
               snmp_oid: "1.3.6.1.4.1.55062.1.12.13.1.3.{#UPSINDEX}"
@@ -1046,14 +1105,14 @@ zabbix_export:
                 - { tag: component, value: health }
           trigger_prototypes: [] # ← REQUIRED
 
-        - uuid: 550e8400e29b41d4a71644665544e030
+        - uuid: 2d0bc6c715f84370a0f90ed9043103bc
           name: "PCIe Expansion Card Discovery"
           type: SNMP_AGENT
           snmp_oid: "discovery[{#PCIEINDEX},1.3.6.1.4.1.55062.1.60.1.1,{#PCIENAME},1.3.6.1.4.1.55062.1.60.1.2]"
           key: qnap.pcie.discovery
           delay: 30m
           item_prototypes:
-            - uuid: 550e8400e29b41d4a71644665544e031
+            - uuid: 07ace10e5d4e44fe8e049ed01e259e4b
               name: "PCIe {#PCIENAME}: Status"
               type: SNMP_AGENT
               snmp_oid: "1.3.6.1.4.1.55062.1.60.1.3.{#PCIEINDEX}"
@@ -1065,12 +1124,70 @@ zabbix_export:
                 - { tag: component, value: pcie }
                 - { tag: component, value: hardware }
           trigger_prototypes:
-            - uuid: 550e8400e29b41d4a71644665544e032
+            - uuid: 5ca3826443ca4e00bae5bfbe68d0eae3
               name: "PCIe {#PCIENAME}: Hardware issue detected"
               expression: "last(/QNAP NAS LLD SNMP/qnap.pcie.status[{#PCIEINDEX}])<>1"
               priority: HIGH
               tags:
                 - { tag: component, value: pcie }
+                - { tag: scope, value: availability }
+
+        - uuid: 8a9dd23e55dd4c4db050e71c2b8f5c8c
+          name: "QNAP App Discovery"
+          type: SNMP_AGENT
+          snmp_oid: "discovery[{#APPINDEX},1.3.6.1.4.1.55062.1.70.1.1,{#APPNAME},1.3.6.1.4.1.55062.1.70.1.2]"
+          key: qnap.app.discovery
+          delay: 30m
+
+          item_prototypes:
+            - uuid: 0ab7ececdf084a6e930c28c4adc8b5e8
+              name: "App {#APPNAME}: Status"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.70.1.3.{#APPINDEX}"
+              key: "qnap.app.status[{#APPINDEX}]"
+              delay: 5m
+              valuemap:
+                name: "System On/Off"
+              tags:
+                - { tag: component, value: app }
+                - { tag: app, value: "{#APPNAME}" }
+
+          trigger_prototypes:
+            - uuid: 8678c1025c734e31bd60fbc555a6af29
+              name: "App {#APPNAME}: Service is down"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.app.status[{#APPINDEX}])=0"
+              priority: WARNING
+              tags:
+                - { tag: component, value: app }
+                - { tag: scope, value: availability }
+
+        - uuid: 35a018bf6ecc4f24a06c717c624a74e5
+          name: "Backup Job Discovery"
+          type: SNMP_AGENT
+          snmp_oid: "discovery[{#JOBINDEX},1.3.6.1.4.1.55062.1.90.1.1,{#JOBNAME},1.3.6.1.4.1.55062.1.90.1.2]"
+          key: qnap.backup.discovery
+          delay: 30m
+
+          item_prototypes:
+            - uuid: 2c7e9b1d4f3a4e0c8b1d6f7a9c5e3d12
+              name: "Backup Job {#JOBNAME}: Last result"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.90.1.3.{#JOBINDEX}"
+              key: "qnap.backup.result[{#JOBINDEX}]"
+              delay: 10m
+              valuemap:
+                name: "Alarm state"
+              tags:
+                - { tag: component, value: backup }
+                - { tag: job, value: "{#JOBNAME}" }
+
+          trigger_prototypes:
+            - uuid: e7c3a9f14d8b4f0c9e2d6b5a1f7c3e91
+              name: "Backup Job {#JOBNAME}: Failed"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.backup.result[{#JOBINDEX}])=2"
+              priority: HIGH
+              tags:
+                - { tag: component, value: backup }
                 - { tag: scope, value: availability }
 
       valuemaps:
