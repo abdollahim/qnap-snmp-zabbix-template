@@ -258,3 +258,76 @@ This release completes the transition from a basic hardware template to a full�
 ### Notes
 This release elevates the template into a **security‑aware monitoring suite**, enabling early detection of intrusion attempts, firmware tampering, malware activity, and system instability.  
 Version 0.3.0 lays the foundation for enterprise‑grade security analytics and prepares the template for the dashboard‑focused enhancements in v0.4.0.
+
+---
+
+## [0.4.0] — Enterprise Features, SLA Metrics & Dashboard Layer
+
+### Added — Enterprise Hardware Support
+- Dual‑controller QNAP support (ES1640dc, enterprise ZFS models)
+- Redundant controller health monitoring (A/B)
+- Controller failover detection and alerting
+- PCIe expansion card extended metrics (bandwidth, link state)
+- Enhanced PSU redundancy logic for multi‑PSU chassis
+
+### Added — SLA & Availability Metrics
+- Host‑level SLA calculation items:
+  - Availability %
+  - Performance %
+  - Capacity %
+- SLA‑oriented triggers for:
+  - Monthly uptime violations
+  - Performance degradation
+  - Capacity SLA breach (pool/volume)
+- New valuemap: **SLA State**
+
+### Added — Dashboard & Visualization Layer
+- Prebuilt Zabbix dashboards (JSON) for:
+  - Hardware overview
+  - Storage overview
+  - Security overview
+  - Performance analytics
+  - Multi‑NAS fleet monitoring
+- Custom widget definitions for:
+  - Temperature groups
+  - RAID/Pool/Volume health
+  - UPS/PSU/BBU status
+  - Security events timeline
+
+### Added — Multi‑NAS Aggregation
+- Global discovery for:
+  - Total NAS count
+  - Total storage capacity across all NAS units
+  - Total free space across all NAS units
+  - Global RAID health summary
+- Multi‑NAS fleet‑level triggers:
+  - “Multiple NAS units reporting degraded RAID”
+  - “Fleet‑wide capacity threshold exceeded”
+  - “Multiple NAS units reporting security incidents”
+
+### Improved — Performance & Analytics
+- Enhanced pool/volume forecasting accuracy
+- Added trend‑based anomaly detection for:
+  - Temperature
+  - IOPS
+  - Throughput
+  - CPU load
+- Improved RAID rebuild progress visibility
+- Optimized polling intervals for enterprise chassis
+
+### Improved — Security & Event Intelligence
+- Event log correlation engine (experimental)
+- Security incident grouping (failed logins + reboot + integrity)
+- Improved firmware integrity logic for dual‑controller systems
+
+### Internal Improvements
+- UUIDv4 regeneration for all new items, triggers, and dashboards
+- Cleanup of deprecated OIDs for older QTS versions
+- Improved tag normalization for SLA and dashboard widgets
+- Verified compatibility with Zabbix 7.4 and 8.x dashboard engine
+
+### Notes
+This release elevates the template into a **full enterprise‑grade monitoring suite**, adding
+SLA metrics, dashboards, multi‑NAS aggregation, and dual‑controller support.  
+Version 0.4.0 prepares the foundation for the final v1.0.0 release, which will focus on
+predictive analytics, automated documentation, and model‑specific optimizations.
