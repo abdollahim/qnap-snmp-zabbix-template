@@ -10,49 +10,56 @@ zabbix_export:
   templates:
     - uuid: 605f422e65104122b30db8c336da0a16
       template: "QNAP NAS LLD SNMP"
-      name: "QNAP NAS LLD SNMP v0.2.0"
+      name: "QNAP NAS LLD SNMP v0.3.0"
       description: |
         Production‑ready SNMP Low‑Level Discovery (LLD) template for QNAP NAS storage devices.
-        Version: 0.2.0
+        Version: 0.3.0
         Author: Majid Abdollahi
 
         This template provides complete, multi‑layer monitoring coverage for QNAP NAS systems using
         native SNMP OIDs, with full automatic discovery of disks, RAID groups, storage pools, volumes,
-        fans, temperature sensors, PSUs, UPS units, and system health indicators. It is fully aligned
-        with the Zabbix 7.4 YAML schema and validated for compatibility with Zabbix 8.x.
+        fans, temperature sensors (with grouping), PSUs, UPS units, PCIe devices, BBU modules, and
+        system health indicators. It is fully aligned with the Zabbix 7.4 YAML schema and validated
+        for compatibility with Zabbix 8.x.
 
         Core Features:
           • Automatic discovery of all major QNAP hardware components (HDDs, RAID groups, pools,
-            volumes, fans, PSUs, UPS, temperature sensors, system health modules)
+            volumes, fans, PSUs, UPS, temperature sensors, PCIe cards, BBU modules, system health)
           • Real‑time monitoring of CPU, memory, uptime, firmware version, SNMP agent availability,
             and system identity
-          • Storage‑focused metrics including capacity, free space, utilization percentage, and
-            temperature for each disk, pool, and volume
-          • RAID group status monitoring with valuemap‑based state interpretation
+          • Storage‑focused metrics including capacity, free space, utilization percentage, IOPS,
+            throughput, and temperature for each disk, pool, and volume
+          • RAID group status monitoring with valuemap‑based state interpretation and rebuild visibility
           • Fan speed and health monitoring with alarm‑state mapping
-          • Temperature sensor discovery with per‑sensor thresholds and alerting
-          • UPS and PSU health monitoring for enterprise‑grade reliability
+          • Temperature sensor discovery with per‑sensor thresholds, grouping (CPU/System/HDD/Ambient),
+            and alerting
+          • UPS, PSU, NVMe, SSD cache, and BBU health monitoring for enterprise‑grade reliability
 
         Advanced Monitoring:
           • Threshold‑based alerting for HDD temperature (warning/critical)
           • Pool and volume free‑space alarms with customizable thresholds
           • RAID degradation and failure detection
-          • System‑wide temperature alarms using CPU and chassis sensors
+          • System‑wide temperature alarms using CPU, chassis, and grouped sensors
           • Memory and CPU utilization alerts for performance diagnostics
-          • Firmware update detection for maintenance planning
+          • Firmware update detection and firmware integrity deep‑check monitoring
+          • Antivirus engine status, malware scan results, and last scan timestamp
+          • Service‑level monitoring for SMB, AFP, NFS, FTP, SSH
+          • Security‑focused monitoring including failed login bursts, intrusion detection,
+            unexpected reboot detection, and system event log visibility
 
         Template Architecture:
-          • Fully LLD‑driven storage and hardware monitoring — no manual configuration required
+          • Fully LLD‑driven storage, hardware, service, and security monitoring — no manual configuration required
           • Clean separation of static system items and dynamic LLD components
           • Optimized polling intervals for performance‑critical vs. slow‑changing metrics
-          • Native Zabbix valuemap support for RAID, PSU, UPS, fan, and health states
-          • Consistent naming, tagging, and key structure for dashboards and filtering
+          • Native Zabbix valuemap support for RAID, PSU, UPS, fan, health, alarm state, and security states
+          • Consistent naming, tagging, and key structure for dashboards, filtering, and analytics
+          • Predictive analytics for pool/volume capacity exhaustion and trend‑based forecasting
 
         Intended Use:
           • Suitable for all QNAP NAS models supporting SNMP v2/v3
           • Designed for production environments requiring deep visibility into storage health,
-            performance, and hardware reliability
-          • Ideal for NOC teams, storage administrators, and environments with multiple QNAP units
+            performance, security, and hardware reliability
+          • Ideal for NOC/SOC teams, storage administrators, and environments with multiple QNAP units
 
         Compatibility:
           • Fully compatible with Zabbix 7.4
@@ -80,9 +87,11 @@ zabbix_export:
           value: "System"
         - macro: "{$TEMP_HDD_GROUP}"
           value: "HDD"
+        - macro: "{$TEMP_AMBIENT_GROUP}"
+          value: "Ambient"
 
       items:
-        - uuid: e64e82d558974465afe739223978ffd1
+        - uuid: 5382956a88ab42b7849c4e32c3c80905
           name: "CPU temperature"
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.24681.1.3.5.0
@@ -92,7 +101,7 @@ zabbix_export:
           tags:
             - { tag: component, value: system }
 
-        - uuid: a7a4f77534aa46e2a25ba5be691a4103
+        - uuid: 3bee94619f814efe8b15619101aafc00
           name: "CPU: Temperature"
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.24681.1.4.1.1.1.1.4.2.0
@@ -102,7 +111,7 @@ zabbix_export:
           tags:
             - { tag: component, value: system }
           triggers:
-            - uuid: e75a7e201e484aacb3decbce3d37bdac
+            - uuid: e247fc1786924301a9f045038fb27c6a
               name: "System: High temperature detected"
               expression: "last(/QNAP NAS LLD SNMP/qnap.cpu.temp)>{$SYSTEM_TEMPERATURE_ALARM}"
               priority: HIGH
@@ -110,7 +119,7 @@ zabbix_export:
                 - { tag: component, value: temperature }
                 - { tag: scope, value: availability }
 
-        - uuid: 7842ef24c95a40d199583ff2ff605281
+        - uuid: 47f986792b9842369951660e7c5a0dac
           name: "CPU: Usage"
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.24681.1.3.1.0
@@ -120,7 +129,7 @@ zabbix_export:
           tags:
             - { tag: component, value: system }
           triggers:
-            - uuid: 86e2a82bc61c46538284a7f395006b51
+            - uuid: bc50e5032b51420c92da2f7b6d764a6c
               name: "System: CPU usage is too high"
               expression: "last(/QNAP NAS LLD SNMP/qnap.cpu.usage)>90"
               priority: WARNING
@@ -128,7 +137,7 @@ zabbix_export:
                 - { tag: component, value: cpu }
                 - { tag: scope, value: performance }
 
-        - uuid: 803123f2121b4d2ab686692130b327a0
+        - uuid: 84b4ae3601df4e92ae31cc96072b9395
           name: "CPU: Load average (1m)"
           type: SNMP_AGENT
           snmp_oid: "1.3.6.1.4.1.55062.1.3.10.1.0"
@@ -137,7 +146,7 @@ zabbix_export:
           tags:
             - { tag: component, value: cpu }
 
-        - uuid: 3bd647b4eb6e4b549e0ad913fbee4556
+        - uuid: 89498aa2bb2f46d28cc93d647be66b12
           name: "CPU: Load average (5m)"
           type: SNMP_AGENT
           snmp_oid: "1.3.6.1.4.1.55062.1.3.10.2.0"
@@ -146,7 +155,7 @@ zabbix_export:
           tags:
             - { tag: component, value: cpu }
 
-        - uuid: f856613c78214f09a3fb43517b88c04a
+        - uuid: 1d6d232c92ba43b7942f852443d67606
           name: "CPU: Load average (15m)"
           type: SNMP_AGENT
           snmp_oid: "1.3.6.1.4.1.55062.1.3.10.3.0"
@@ -155,7 +164,24 @@ zabbix_export:
           tags:
             - { tag: component, value: cpu }
 
-        - uuid: 2a7f02cdbbb94301a719d3d47aba86cb
+        - uuid: a8ea9b7a81c54c6faee48c5db9e5486d
+          name: "SNMP agent: Stability counter"
+          type: INTERNAL
+          key: "zabbix[host,snmp,available]"
+          delay: 1m
+          tags:
+            - { tag: component, value: availability }
+            - { tag: scope, value: stability }
+          triggers:
+            - uuid: b5827d0a9d6e4adcb78f876d944cd1cb
+              name: "SNMP agent: Flapping detected"
+              expression: "count(/QNAP NAS LLD SNMP/zabbix[host,snmp,available],5m,0)=0"
+              priority: WARNING
+              tags:
+                - { tag: component, value: availability }
+                - { tag: scope, value: stability }
+
+        - uuid: 3e0cbd80036d403788ea95b7d024fa7c
           name: "System: Total memory"
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.24681.1.3.2.0
@@ -165,7 +191,7 @@ zabbix_export:
           tags:
             - { tag: component, value: system }
 
-        - uuid: 4e46ef6fe0d24f49968a526a6782c428
+        - uuid: 8d964dd2a46d468083afa96854c07e70
           name: "System: Free memory"
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.24681.1.3.3.0
@@ -177,7 +203,7 @@ zabbix_export:
           tags:
             - { tag: component, value: system }
 
-        - uuid: e084f51d49724f53915ee24fafe46176
+        - uuid: fbe257a949dc40b492055c5f47a1e4e8
           name: "System: Free memory (%)"
           type: CALCULATED
           key: qnap.mem.free.pct
@@ -188,7 +214,7 @@ zabbix_export:
           tags:
             - { tag: component, value: system }
           triggers:
-            - uuid: 3f70a1a09a3c4d32bbc9c2b6ccf78b73
+            - uuid: e79579722e48444b8c2b1c9c5340b06d
               name: "System: Free memory is too low"
               expression: "last(/QNAP NAS LLD SNMP/qnap.mem.free.pct)<{$MEMORY_FREE_ALARM}"
               priority: WARNING
@@ -216,7 +242,7 @@ zabbix_export:
                 - { tag: component, value: nvme }
                 - { tag: scope, value: availability }
 
-        - uuid: 7a94f638e8504952893f46209e2f4512
+        - uuid: be7587e2789e423caca92a64970fc939
           name: "SSD Cache: Wear level (%)"
           type: SNMP_AGENT
           snmp_oid: "1.3.6.1.4.1.55062.1.50.2.1.0"
@@ -227,7 +253,7 @@ zabbix_export:
             - { tag: component, value: ssd }
             - { tag: component, value: cache }
           triggers:
-            - uuid: 063273376dda4d7a9f9a196e756b60bc
+            - uuid: 971db53b52dd425baaaec09b7de77871
               name: "SSD Cache: Wear level critical"
               expression: "last(/QNAP NAS LLD SNMP/qnap.ssd.wear)>80"
               priority: HIGH
@@ -235,7 +261,7 @@ zabbix_export:
                 - { tag: component, value: ssd }
                 - { tag: scope, value: capacity }
 
-        - uuid: 39d1df742346484da6828fdbb3dfa493
+        - uuid: 2739afdabc6f4320ba4780bd04ace024
           name: "Snapshots: Space used (%)"
           type: SNMP_AGENT
           snmp_oid: "1.3.6.1.4.1.55062.1.80.1.1.0"
@@ -246,7 +272,7 @@ zabbix_export:
             - { tag: component, value: snapshot }
             - { tag: component, value: storage }
           triggers:
-            - uuid: dee364c810d84e14a0583e58a8cd383e
+            - uuid: 913a06cc167b4645919afe25cb7baef4
               name: "Snapshots: Space usage high"
               expression: "last(/QNAP NAS LLD SNMP/qnap.snapshots.used.pct)>80"
               priority: HIGH
@@ -254,7 +280,7 @@ zabbix_export:
                 - { tag: component, value: snapshot }
                 - { tag: scope, value: capacity }
 
-        - uuid: 107f30d0295f427f8f3374f4d99c2e18
+        - uuid: 4f653a0ed56b4483a04075454686c088
           name: "Replication: Last job status"
           type: SNMP_AGENT
           snmp_oid: "1.3.6.1.4.1.55062.1.100.1.1.0"
@@ -266,13 +292,23 @@ zabbix_export:
             - { tag: component, value: replication }
             - { tag: component, value: backup }
           triggers:
-            - uuid: 14e78c20ee9c4c2a9776a4c4d984a7a2
+            - uuid: 1717031dba614d418a1c67f2a7c91947
               name: "Replication: Last job failed"
               expression: "last(/QNAP NAS LLD SNMP/qnap.replication.status)=2"
               priority: HIGH
               tags:
                 - { tag: component, value: replication }
                 - { tag: scope, value: availability }
+
+        - uuid: 9a89a7bcf4e24332ba040300a026fb14
+          name: "Antivirus: Last scan time"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.110.1.2.0"
+          key: qnap.antivirus.lastscan
+          delay: 1h
+          value_type: TEXT
+          tags:
+            - { tag: component, value: antivirus }
 
         - uuid: 042feb89d0a84471b56273f6ecd76f68
           name: "Antivirus: Engine status"
@@ -347,6 +383,36 @@ zabbix_export:
           inventory_link: SERIALNO_A
           tags:
             - { tag: component, value: system }
+
+        - uuid: 5450bf634ccd4ec6aae4810f66bb9b67
+          name: "Security: Failed login burst"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.40.1.2.0"
+          key: qnap.security.failed.burst
+          delay: 1m
+          tags:
+            - { tag: component, value: security }
+            - { tag: scope, value: intrusion }
+
+        - uuid: eccb6898dc424b45a6f8d1c6f2987155
+          name: "Security: Firmware integrity (deep)"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.40.2.2.0"
+          key: qnap.security.fw.integrity.deep
+          delay: 1h
+          valuemap:
+            name: "Health Status"
+          tags:
+            - { tag: component, value: security }
+            - { tag: scope, value: integrity }
+          triggers:
+            - uuid: ac246472a01042f2a4a0bc90f577b619
+              name: "Security: Firmware integrity deep check failed"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.security.fw.integrity.deep)<>1"
+              priority: HIGH
+              tags:
+                - { tag: component, value: security }
+                - { tag: scope, value: integrity }
 
         - uuid: 264de4e4acc24dd98749fc797a190a3f
           name: "System: Firmware version"
@@ -524,6 +590,24 @@ zabbix_export:
               tags:
                 - { tag: component, value: system }
                 - { tag: scope, value: health }
+
+        - uuid: 6a06477757224255a0b0253056d53416
+          name: "Security: Failed login burst"
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.55062.1.40.1.2.0
+          key: qnap.security.failed.burst
+          delay: 1m
+          tags:
+            - { tag: component, value: security }
+            - { tag: scope, value: intrusion }
+          triggers:
+            - uuid: 9650c1045e6c4750b84f410f1eba3a1b
+              name: "Security: Possible intrusion detected"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.security.failed.burst)>10"
+              priority: HIGH
+              tags:
+                - { tag: component, value: security }
+                - { tag: scope, value: intrusion }
 
         - uuid: d233a998cfce432cbf7060080a6a3a67
           name: "Security: Failed login attempts"
@@ -1047,6 +1131,7 @@ zabbix_export:
               tags:
                 - { tag: component, value: temperature }
                 - { tag: component, value: health }
+                - { tag: temp_group, value: "{#TEMP_GROUP}" }
 
           trigger_prototypes:
             - uuid: 550e8400e29b41d4a71644665544a03a
@@ -1189,6 +1274,33 @@ zabbix_export:
               tags:
                 - { tag: component, value: backup }
                 - { tag: scope, value: availability }
+
+        - uuid: f810560b272745c89a551b5d1f71febf
+          name: "System Event Log Discovery"
+          type: SNMP_AGENT
+          snmp_oid: "discovery[{#EVENTID},1.3.6.1.4.1.55062.1.30.2.1.1]"
+          key: qnap.event.discovery
+          delay: 10m
+
+          item_prototypes:
+            - uuid: 6017a7d5e7144bafb8eb0074805ba037
+              name: "Event {#EVENTID}: Message"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.30.2.1.2.{#EVENTID}"
+              key: "qnap.event.message[{#EVENTID}]"
+              value_type: TEXT
+              delay: 10m
+              tags:
+                - { tag: component, value: event }
+
+          trigger_prototypes:
+            - uuid: 9b3ec3e34d1843d29500472fb79da3af
+              name: "New system event detected: {#EVENTID}"
+              expression: "change(/QNAP NAS LLD SNMP/qnap.event.message[{#EVENTID}])<>0"
+              priority: WARNING
+              tags:
+                - { tag: component, value: event }
+                - { tag: scope, value: health }
 
       valuemaps:
         - uuid: 550e8400e29b41d4a71644665544a517
