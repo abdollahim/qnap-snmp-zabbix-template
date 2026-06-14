@@ -145,3 +145,75 @@ and redundancy awareness.
 ### Notes
 This version transforms the template into a performance‑aware monitoring system capable of
 forecasting capacity exhaustion and tracking real‑time storage performance.
+
+---
+
+## [0.2.0] — Full Hardware, Service & Analytics Integration
+
+### Added — Major New Monitoring Modules
+- UPS discovery (LLD) with per‑unit status and health mapping
+- BBU (battery‑backed write cache) monitoring
+- NVMe cache health monitoring
+- SSD cache wear‑level tracking
+- PCIe expansion card discovery and status
+- Antivirus engine monitoring (enabled/disabled)
+- Malware scan result monitoring
+- Replication job status monitoring
+- Snapshot usage monitoring
+- Event log error counter
+- Failed login attempt counter with intrusion detection trigger
+
+### Added — LLD Enhancements
+- Complete rebuild of Pool Discovery:
+  - Capacity
+  - Free space
+  - Free %
+  - Read/Write IOPS
+  - Read/Write throughput
+  - Days‑until‑full forecasting
+- Improved Volume Discovery (capacity, free %, throughput)
+- Improved Disk Discovery (capacity, temperature, state)
+- Improved RAID Discovery (status, rebuild visibility)
+- Improved FAN Discovery (speed, health)
+- Improved PSU Discovery (status, redundancy)
+- Improved Temperature Sensor Discovery with grouping macros
+- Improved System Health module discovery
+
+### Added — Service Layer Monitoring
+- SMB service status
+- AFP service status
+- NFS service status
+- FTP service status
+- SSH service status
+- Triggers for service outages
+
+### Improved — Performance & Analytics
+- CPU load averages (1m/5m/15m)
+- Trend‑based capacity forecasting for pools and volumes
+- Optimized polling intervals for performance‑critical metrics
+- Normalized tags across all LLD prototypes
+- Unified naming conventions for keys and items
+
+### Improved — Security & Reliability
+- Firmware integrity monitoring
+- Unexpected reboot detection
+- Enhanced intrusion detection (failed login bursts)
+- Malware detection triggers
+- Strengthened system health visibility
+
+### Internal Improvements
+- Complete UUIDv4 regeneration across:
+  - All discovery rules
+  - All item prototypes
+  - All trigger prototypes
+  - All static items
+- Removed all legacy invalid UUIDs
+- Removed all duplicate UUIDs
+- Ensured full RFC‑4122 UUIDv4 compliance
+- Ensured Zabbix 7.4 schema compatibility
+- Validated import on Zabbix 8.x
+- Cleaned valuemap references
+- Normalized tag structure
+
+### Notes
+This release completes the transition from a basic hardware template to a full‑stack QNAP monitoring suite, covering hardware, storage, services, security, performance, and predictive analytics. Version 0.2.0 is the first production‑grade, fully comprehensive release.
