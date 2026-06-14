@@ -334,8 +334,6 @@ predictive analytics, automated documentation, and model‑specific optimization
 
 ---
 
-# QNAP NAS LLD SNMP — Changelog
-
 ## [0.6.0] — Predictive Analytics, NVMe Endurance, RAID ETA, Thermal Drift
 **Release date:** 2026‑06‑14  
 **Author:** Majid Abdollahi
