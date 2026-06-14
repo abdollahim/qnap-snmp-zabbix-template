@@ -2,37 +2,37 @@
 Production‑ready SNMP Low‑Level Discovery (LLD) template for QNAP NAS storage devices.  
 Designed for Zabbix 7.4+ with full compatibility validation for Zabbix 8.x.
 
-**Version:** 0.0.1
+**Version:** 0.2.0  
 **Author:** Majid Abdollahi
 
 ---
 
 ## 📌 Overview
-This template provides complete, automated monitoring coverage for QNAP NAS systems using
-native SNMP OIDs. It includes full hardware discovery, storage analytics, system health
-monitoring, and performance metrics — all aligned with the Zabbix 7.4 YAML schema.
+Version **0.2.0** significantly expands the monitoring scope of the template, transforming it from a hardware‑focused baseline into a **full‑stack QNAP observability suite**.  
+This release introduces enterprise‑grade hardware coverage, service monitoring, security visibility, and predictive analytics.
 
-The template is optimized for production environments, large deployments, and NOC‑level
-observability requirements.
+The template remains fully aligned with the Zabbix 7.4 YAML schema and is validated for Zabbix 8.x.
 
 ---
 
 ## 🚀 Features
 
-### 🔍 **Automatic Low‑Level Discovery**
+### 🔍 **Automatic Low‑Level Discovery (LLD)**
 - HDD discovery (capacity, temperature, state)
-- RAID group discovery (status, capacity, free space)
-- Storage pool discovery (capacity, free %, thresholds)
-- Volume discovery (capacity, free %, thresholds)
+- RAID group discovery (status, rebuild visibility)
+- Storage pool discovery (capacity, free %, IOPS, throughput, forecast)
+- Volume discovery (capacity, free %, throughput)
 - FAN discovery (speed, health)
-- PSU discovery (status)
-- UPS discovery (status)
-- Temperature sensor discovery (per‑sensor alarms)
+- PSU discovery (status, redundancy)
+- UPS discovery (status, health)
+- Temperature sensor discovery (grouped by CPU/System/HDD)
+- PCIe expansion card discovery
 - System health module discovery
 
 ### 🖥️ **Static System Monitoring**
-- CPU temperature
+- CPU temperature (legacy + modern OIDs)
 - CPU usage
+- CPU load averages (1m / 5m / 15m)
 - Memory usage (absolute & %)
 - System uptime
 - Hostname, serial number, firmware version
@@ -44,10 +44,16 @@ observability requirements.
 - Pool free space below threshold
 - Volume free space below threshold
 - RAID degraded or failed
-- Fan/PSU/UPS failures
+- Fan/PSU/UPS/BBU failures
+- Temperature sensor high alarm
 - System health abnormal
 - CPU temperature high
 - Memory low
+- Unexpected reboot
+- Service failures (SMB, AFP, NFS, FTP, SSH)
+- Antivirus disabled
+- Malware detected
+- Failed login burst detection
 - SNMP agent unavailable
 
 ### 📊 **Valuemap Support**
@@ -57,14 +63,16 @@ observability requirements.
 - Alarm State  
 - Health Status  
 - Firmware Version Available  
+- IF‑MIB Operational Status  
 
 ---
 
 ## 🧩 Template Architecture
-- Fully LLD‑driven hardware and storage monitoring
+- Fully LLD‑driven hardware, storage, service, and security monitoring
 - Clean separation of static system items vs. dynamic LLD items
 - Optimized polling intervals for performance‑critical vs. slow‑changing metrics
 - Consistent naming, tagging, and key structure for dashboards and filtering
+- Predictive analytics for capacity exhaustion (pools & volumes)
 - YAML schema validated for Zabbix 7.4 and tested on Zabbix 8.x
 
 ---
@@ -98,72 +106,30 @@ observability requirements.
 
 ## 🗺️ Roadmap
 
-The following roadmap outlines planned enhancements and future development goals for the
-**QNAP NAS LLD SNMP** template. Features are grouped by milestone versions to provide a clear,
-predictable evolution path toward a full enterprise‑grade monitoring suite.
-
----
-
-### 🔹 v0.0.2 — Storage & Hardware Enhancements
-- [ ] SMART attribute monitoring (if OIDs available)
-- [ ] Disk IOPS & latency metrics
-- [ ] Network interface LLD (IF‑MIB)
-- [ ] Fan RPM threshold alerts (warning/critical)
-- [ ] PSU redundancy state monitoring
-- [ ] Temperature sensor grouping (CPU / System / HDD / Ambient)
-- [ ] Improved tag normalization across all LLD prototypes
-
----
-
-### 🔹 v0.1.0 — Performance & Capacity Analytics
-- [ ] Pool & volume performance metrics (IOPS, throughput)
-- [ ] RAID rebuild progress monitoring
-- [ ] Disk wear‑level / lifespan indicators
-- [ ] CPU load averages (1m / 5m / 15m)
-- [ ] Memory buffer/cache breakdown
-- [ ] Predictive capacity analytics (pool/volume full date)
-- [ ] Predictive disk failure risk (SMART + temperature)
-- [ ] Graph prototypes for temperature, capacity, and performance trends
-
----
-
-### 🔹 v0.2.0 — QNAP Services & Apps Monitoring
-- [ ] QNAP service status (SMB, NFS, AFP, FTP, SSH, WebDAV)
-- [ ] QNAP app status (Container Station, HBS, etc.)
-- [ ] Antivirus status monitoring
-- [ ] Snapshot space usage
-- [ ] Backup/replication job status (RTRR / Rsync)
-- [ ] Alerts for service failures, backup job errors, and snapshot issues
-
----
-
 ### 🔹 v0.3.0 — Security & Health Monitoring
-- [ ] Failed login attempt monitoring
-- [ ] Admin password age
-- [ ] Firmware integrity status
-- [ ] Malware scan results (if exposed)
-- [ ] System event log LLD (if possible)
-- [ ] Alerts for suspicious activity, unexpected reboots, and firmware mismatch
-
----
+- System event log LLD (if possible)
+- Admin password age
+- Firmware integrity deep checks
+- Advanced intrusion detection
+- Malware scan history
+- Suspicious activity correlation
 
 ### 🔹 v0.4.0 — Enterprise Features
-- [ ] Dual‑controller QNAP support (ES1640dc, enterprise ZFS models)
-- [ ] Multi‑NAS dashboard (global overview)
-- [ ] SLA‑oriented KPIs (availability %, performance %, capacity %)
-- [ ] Custom Zabbix dashboard widgets
-- [ ] Prebuilt dashboards (JSON)
-- [ ] Prebuilt screens and host groups
-
----
+- Dual‑controller QNAP support (ES1640dc, enterprise ZFS)
+- Multi‑NAS dashboard (global overview)
+- SLA‑oriented KPIs (availability %, performance %, capacity %)
+- Prebuilt dashboards (JSON)
+- Custom widgets for QNAP metrics
 
 ### 🔹 v1.0.0 — Full Enterprise Release
-- [ ] Complete hardware + storage + service + security coverage
-- [ ] Predictive analytics for capacity and failure
-- [ ] Full dashboard suite
-- [ ] Automated documentation generation
-- [ ] Model‑specific optimizations (TS‑x53, TS‑x73, TVS‑x72, ZFS NAS, etc.)
-- [ ] Community contributions integrated
+- Complete hardware + storage + service + security coverage
+- Predictive analytics for capacity and failure
+- Full dashboard suite
+- Automated documentation generation
+- Model‑specific optimizations (TS‑x53, TS‑x73, TVS‑x72, ZFS NAS, etc.)
+- Community contributions integrated
+
+---
 
 ## 📄 License
 This template is released under the MIT License.
