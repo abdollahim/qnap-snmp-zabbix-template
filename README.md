@@ -1,25 +1,31 @@
-# QNAP NAS SNMP LLD Template  
-### Version 1.0.0 — Stable Release  
-Author: **Majid Abdollahi**
+# QNAP NAS SNMP LLD Template for Zabbix
 
-This repository contains the **production‑ready SNMP Low‑Level Discovery (LLD) template** for
-monitoring QNAP NAS devices using Zabbix. Version **1.0.0** represents the first **stable**
-release of the SNMP‑based template, incorporating all features developed across versions
-0.1.0 through 0.9.0.
-
-> **Important:**  
-> Modern QNAP models running **QTS 5.x / QuTS hero** (including TS‑873AeU‑RP) expose only
-> basic system metrics via SNMP. Storage‑level OIDs (disks, RAID, pools, volumes, SMART,
-> NVMe, fans, PSU) are no longer available through SNMP.  
->  
-> This template remains fully functional for **legacy QNAP models** that still support the
-> full QNAP private MIB.
+**Version:** 1.0.0  
+**Compatibility:** Zabbix 7.4+ (tested on 8.x)  
+**Author:** Majid Abdollahi  
 
 ---
 
-## 📦 Features
+## Overview
 
-### ✔ Core Monitoring
+This template provides **SNMP‑based monitoring** for QNAP NAS devices, including system‑level
+metrics, predictive analytics, and LLD‑driven discovery for legacy QNAP models that still
+expose storage OIDs. Version **1.0.0** is the **stable SNMP release**, consolidating all
+features developed across versions 0.1.0 through 0.9.0.
+
+> ⚠️ **Important Note**  
+> Modern QNAP models running **QTS 5.x / QuTS hero** (including TS‑873AeU‑RP) expose only
+> basic system metrics via SNMP. Storage‑level OIDs (disks, RAID, pools, volumes, SMART,
+> NVMe, fans, PSU) are no longer available.  
+>  
+> The template remains fully functional for **legacy QNAP models** that support the full
+> QNAP private MIB.
+
+---
+
+## Key Capabilities
+
+### 🖥️ System Monitoring (All Models)
 - CPU utilization  
 - Memory usage  
 - System uptime  
@@ -27,7 +33,7 @@ release of the SNMP‑based template, incorporating all features developed acros
 - SNMP agent availability  
 - System identity and model information  
 
-### ✔ Storage & Hardware (Legacy QNAP Models Only)
+### 📦 Storage & Hardware Monitoring (Legacy Models Only)
 - Automatic discovery of:
   - HDDs  
   - RAID groups  
@@ -50,7 +56,7 @@ release of the SNMP‑based template, incorporating all features developed acros
   - Pool fragmentation  
   - Volume latency and queue depth  
 
-### ✔ Predictive Analytics (Legacy Models)
+### 🧠 Predictive Analytics (Legacy Models)
 - SMART anomaly detection  
 - SMART volatility index  
 - Disk lifetime forecasting  
@@ -62,66 +68,143 @@ release of the SNMP‑based template, incorporating all features developed acros
 - Volume performance anomaly detection  
 - Volume stability index  
 
-### ✔ Security & System Health
+### 🔐 Security & System Health
 - Failed login bursts  
 - Intrusion detection  
 - Unexpected reboot detection  
-- Antivirus status and last scan  
+- Antivirus engine status and last scan  
 - Service‑level monitoring (SMB, AFP, NFS, FTP, SSH)  
 
 ---
 
-## 🧩 Template Architecture
+## Macros
+
+| Macro                        | Default | Description                                      |
+|------------------------------|---------|--------------------------------------------------|
+| `{$CPU_WARN}`                | 80      | CPU warning threshold (%)                        |
+| `{$CPU_HIGH}`                | 90      | CPU critical threshold (%)                       |
+| `{$MEM_WARN}`                | 80      | Memory warning threshold (%)                     |
+| `{$MEM_HIGH}`               | 90      | Memory critical threshold (%)                    |
+| `{$TEMP_WARN}`               | 60      | Temperature warning threshold (°C)               |
+| `{$TEMP_HIGH}`               | 70      | Temperature critical threshold (°C)              |
+| `{$DISK_LIFE_WARN}`          | 20      | Remaining life warning threshold (%)             |
+| `{$DISK_LIFE_CRIT}`          | 10      | Remaining life critical threshold (%)            |
+| `{$TEMPLATE.VERSION}`        | 1.0.0   | Template version metadata                        |
+
+---
+
+## Discovery Rules (Legacy Models)
+
+### ✔ Disk Discovery  
+- SMART attributes  
+- Temperature  
+- Wear‑leveling  
+- Remaining life  
+
+### ✔ RAID Discovery  
+- RAID state  
+- Rebuild progress  
+- Rebuild ETA  
+
+### ✔ Pool Discovery  
+- Capacity  
+- Free space  
+- Fragmentation  
+
+### ✔ Volume Discovery  
+- Latency  
+- Queue depth  
+- Utilization  
+
+### ✔ NVMe Discovery  
+- Endurance  
+- Temperature  
+- Remaining life  
+
+### ✔ Fan & Temperature Sensor Discovery  
+- Per‑sensor temperature  
+- Fan RPM  
+- Alarm states  
+
+---
+
+## Item Prototypes (Summary)
+
+| Item Name                       | Key                                | Type        | Description                                   |
+|--------------------------------|------------------------------------|-------------|-----------------------------------------------|
+| CPU usage                      | `qnap.cpu.usage`                   | SNMP        | System CPU load                                |
+| Memory usage                   | `qnap.mem.usage`                   | SNMP        | System memory load                             |
+| System temperature             | `qnap.temp.system`                 | SNMP        | Chassis temperature                            |
+| Disk temperature               | `qnap.disk.temp[{#DISK}]`          | SNMP        | Per‑disk temperature                           |
+| Disk remaining life            | `qnap.disk.life[{#DISK}]`          | SNMP        | SSD/HDD remaining life (%)                     |
+| SMART attributes               | `qnap.smart.*[{#DISK}]`            | SNMP        | SMART counters                                 |
+| RAID state                     | `qnap.raid.state[{#RAID}]`         | SNMP        | RAID health                                    |
+| RAID rebuild progress          | `qnap.raid.rebuild[{#RAID}]`       | SNMP        | Rebuild %                                      |
+| Pool fragmentation             | `qnap.pool.frag[{#POOL}]`          | SNMP        | Fragmentation level                            |
+| Volume latency                 | `qnap.vol.latency[{#VOL}]`         | SNMP        | Read/write latency                             |
+| NVMe endurance                 | `qnap.nvme.endurance[{#NVME}]`     | SNMP        | Remaining endurance (%)                        |
+
+---
+
+## Trigger Prototypes (Summary)
+
+| Trigger Name                                | Description                                   | Priority |
+|---------------------------------------------|-----------------------------------------------|----------|
+| CPU > warn/high                             | CPU utilization thresholds                    | WARNING / HIGH |
+| Memory > warn/high                          | Memory utilization thresholds                 | WARNING / HIGH |
+| System temperature high                     | Chassis temperature                           | HIGH     |
+| Disk temperature high                       | Per‑disk temperature                          | WARNING / HIGH |
+| Disk remaining life low                     | SSD/HDD wear‑out                              | WARNING / HIGH |
+| SMART anomaly detected                      | Based on anomaly score                        | WARNING  |
+| SMART volatility high                       | Attribute instability                         | WARNING  |
+| Disk failure probability high               | Predictive failure model                      | HIGH     |
+| RAID degraded                               | RAID state abnormal                           | HIGH     |
+| RAID rebuild slow                           | Rebuild speed anomaly                         | WARNING  |
+| Pool fragmentation high                     | Fragmentation threshold                       | WARNING  |
+| Volume latency high                         | Performance degradation                       | WARNING  |
+| NVMe endurance low                          | NVMe wear‑out                                 | HIGH     |
+
+---
+
+## Tags
+
+- **component:** cpu / memory / disk / raid / pool / volume / nvme / temp / fan / smart / security  
+- **severity:** info / warning / high  
+- **prediction:** anomaly / volatility / degradation / failure  
+- **release:** stable  
+
+---
+
+## Features Summary
 
 - Fully SNMP‑based  
-- LLD‑driven discovery for all storage and hardware components (where supported)  
-- Clean separation of static and dynamic items  
-- Optimized polling intervals  
-- Extensive use of valuemaps  
-- Predictive analytics built on dependent items and trend functions  
-- SLA‑oriented metrics for availability, performance, and capacity  
+- Predictive analytics (v0.6.0–v0.9.0)  
+- Anomaly detection & volatility scoring  
+- Stability and degradation metrics  
+- SLA‑oriented performance indicators  
+- Dashboard‑friendly tagging  
+- Optimized history/trends  
+- GitHub‑ready metadata and versioning  
 
 ---
 
-## ⚠️ SNMP Support Notes
+## Usage Instructions
 
-### Modern QNAP Models (QTS 5.x / QuTS hero)
-- Only basic system metrics are available via SNMP  
-- Storage‑level OIDs are removed by QNAP  
-- LLD rules for disks, RAID, pools, volumes, SMART, NVMe, fans, PSU will return **no data**  
-- This is expected behavior and not a template issue  
-
-### Legacy QNAP Models
-- Full SNMP storage telemetry is available  
-- All LLD rules and predictive analytics work as designed  
+1. Import the template YAML (`QNAP_SNMP_LLD_v1.0.0.yaml`) into Zabbix.  
+2. Assign the template to your QNAP NAS host.  
+3. Adjust macros as needed.  
+4. System‑level metrics will populate immediately.  
+5. Storage‑level LLD will populate **only on legacy QNAP models** with full SNMP support.  
 
 ---
 
-## 📘 Compatibility
+## Notes
 
-- Fully compatible with **Zabbix 7.4**  
-- Validated for import and runtime behavior on **Zabbix 8.x**  
-- Works with:
-  - QTS 4.x (full SNMP support)  
-  - QTS 5.x (limited SNMP support)  
-  - QuTS hero (limited SNMP support)  
+- Modern QNAP models (QTS 5.x / QuTS hero) expose **limited SNMP data**.  
+- Storage‑level monitoring requires legacy QNAP firmware with full SNMP MIB support.  
+- Predictive analytics rely on SMART and storage OIDs; unavailable on newer models.  
+- Version 1.0.0 finalizes the SNMP branch; future versions will use REST API.  
 
 ---
 
-## 🏁 Version 1.0.0 Status
-
-This release finalizes the **SNMP branch** of the QNAP monitoring template.
-
-All future development (Version 2.x and beyond) will focus on **REST‑API‑based monitoring**,
-which provides full storage and hardware visibility on modern QNAP systems.
-
----
-
-## 📄 License
-MIT License
-
----
-
-## 🙌 Author
-**Majid Abdollahi**  
-Storage Monitoring & Predictive Analytics Architect
+**End of README**
