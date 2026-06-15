@@ -528,7 +528,48 @@ Version **0.8.0** introduces advanced analytics and forecasting capabilities, in
 - Deprecated static rebuild ETA calculations (replaced with curve‑fit model)
 - Removed outdated SMART threshold triggers superseded by volatility/anomaly scoring
 
+## Summary
+Version **0.9.0** introduces advanced predictive‑maintenance intelligence, including failure‑probability modeling, SMART volatility analysis, RAID rebuild curve fitting, degradation‑velocity tracking, thermal fatigue scoring, and volume stability analytics. This release significantly enhances early‑warning accuracy, long‑term reliability forecasting, and fleet‑level risk assessment for QNAP NAS environments.
+
+---
+
+## [1.0.0] — Stable SNMP Release
+**Release date:** 2026‑06‑18  
+**Author:** Majid Abdollahi
+
+### Overview
+Version **1.0.0** marks the first **stable release** of the SNMP‑based QNAP NAS monitoring
+template. All functional features from versions 0.1.0 through 0.9.0 are included, and the
+template is now considered complete for all QNAP models that expose storage and hardware
+telemetry via SNMP.
+
+Due to architectural changes in modern QNAP firmware (QTS 5.x / QuTS hero), many newer
+models—including the TS‑873AeU‑RP—no longer expose storage‑level SNMP OIDs. For these
+systems, only standard system metrics are available via SNMP. The template remains fully
+functional for legacy models that still support the full QNAP private MIB.
+
+### Added
+- **Versioning and documentation updates** for the stable SNMP release
+- **Finalized template description** reflecting SNMP limitations on modern QNAP devices
+- **Stability classification** for long‑term maintenance
+
+### Improved
+- Consolidated all predictive‑analytics logic introduced in versions 0.6.0–0.9.0
+- Refined documentation to clarify SNMP support differences across QNAP generations
+- Cleaned metadata and version tags for long‑term stability
+
+### Fixed
+- Minor metadata inconsistencies in previous versions
+- Updated compatibility notes for QTS 5.x and QuTS hero
+
+### Removed
+- No functional removals; SNMP feature set remains identical to v0.9.0
+
 ---
 
 ## Summary
-Version **0.9.0** introduces advanced predictive‑maintenance intelligence, including failure‑probability modeling, SMART volatility analysis, RAID rebuild curve fitting, degradation‑velocity tracking, thermal fatigue scoring, and volume stability analytics. This release significantly enhances early‑warning accuracy, long‑term reliability forecasting, and fleet‑level risk assessment for QNAP NAS environments.
+Version **1.0.0** is the **final and stable SNMP‑based release** of the QNAP NAS LLD template.
+All monitoring, LLD, and predictive‑analytics features introduced up to v0.9.0 are included.
+For modern QNAP models that no longer expose storage OIDs via SNMP, this template provides
+system‑level monitoring only. Future development will focus on REST‑API‑based monitoring for
+full hardware and storage visibility.
