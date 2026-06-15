@@ -482,3 +482,53 @@ Version **0.7.0** introduces full SMART attribute discovery, RAID consistency mo
 
 ## Summary
 Version **0.8.0** introduces advanced analytics and forecasting capabilities, including SMART anomaly detection, disk lifetime estimation, RAID rebuild speed analysis, thermal stress scoring, and performance anomaly detection. This release significantly enhances predictive maintenance, early‑warning accuracy, and long‑term reliability insights for QNAP NAS environments.
+
+---
+
+## [0.9.0] — Failure Probability, Anomaly Clustering, RAID Curve Fitting
+**Release date:** 2026‑06‑17  
+**Author:** Majid Abdollahi
+
+### Added
+- **Disk Failure Probability Model (DFP%)**
+  - Multi‑factor probability score using SMART anomalies, thermal stress, wear‑leveling,
+    remaining life %, and lifetime‑days forecasting
+  - Trigger for high failure probability (>70%)
+- **SMART Volatility Index (SVI)**
+  - Measures instability of SMART attributes over a 7‑day baseline
+  - Trigger for high volatility (>20)
+- **Disk Degradation Velocity (DDV)**
+  - Tracks long‑term degradation rate of remaining‑life %
+  - Trigger for rapid degradation (>5% deviation)
+- **RAID Rebuild Curve‑Fit ETA**
+  - Curve‑fitted ETA estimation using short‑term rebuild progress deltas
+  - Trigger for extremely high ETA (>1440 minutes)
+- **Thermal Fatigue Index (TFI)**
+  - Long‑term thermal stress model combining temperature, drift, and TSI
+  - Trigger for high thermal fatigue (>90)
+- **Volume Stability Index (VSI)**
+  - Measures long‑term latency variance and performance stability
+  - Trigger for degraded stability (>30)
+
+### Improved
+- Enhanced predictive‑maintenance architecture with multi‑factor scoring
+- Strengthened SMART analytics with volatility and anomaly‑cluster modeling
+- Improved RAID monitoring with curve‑fit ETA prediction
+- Expanded temperature analytics with thermal fatigue modeling
+- Improved volume performance diagnostics with stability scoring
+- Unified dependent‑item structure for all predictive metrics
+
+### Fixed
+- Corrected dependent‑item master references for new predictive models
+- Fixed inconsistencies in SMART volatility calculations
+- Resolved missing trend windows for long‑term degradation metrics
+- Eliminated legacy rebuild ETA logic from earlier versions
+
+### Removed
+- Deprecated static rebuild ETA calculations (replaced with curve‑fit model)
+- Removed outdated SMART threshold triggers superseded by volatility/anomaly scoring
+
+---
+
+## Summary
+Version **0.9.0** introduces advanced predictive‑maintenance intelligence, including failure‑probability modeling, SMART volatility analysis, RAID rebuild curve fitting, degradation‑velocity tracking, thermal fatigue scoring, and volume stability analytics. This release significantly enhances early‑warning accuracy, long‑term reliability forecasting, and fleet‑level risk assessment for QNAP NAS environments.
