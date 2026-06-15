@@ -377,3 +377,57 @@ predictive analytics, automated documentation, and model‑specific optimization
 
 ## Summary
 Version **0.6.0** introduces the first generation of **predictive analytics** for QNAP NAS monitoring, including disk health scoring, NVMe endurance tracking, RAID rebuild forecasting, and temperature drift detection. This release significantly enhances reliability, early‑warning capabilities, and long‑term storage health visibility across all QNAP NAS models.
+
+---
+
+# QNAP NAS LLD SNMP — Changelog
+
+## [0.7.0] — SMART LLD, RAID Consistency, Pool Fragmentation, I/O Latency
+**Release date:** 2026‑06‑15  
+**Author:** Majid Abdollahi
+
+### Added
+- **SMART Attribute Discovery (new LLD rule)**
+  - Automatic discovery of SMART attributes per disk
+  - New item prototypes for SMART attribute values
+  - Trigger prototype for critical SMART attributes
+- **RAID Consistency Check Monitoring**
+  - New item prototype for RAID scrub/consistency status
+  - Trigger for failed or incomplete consistency checks
+- **Pool Fragmentation Monitoring**
+  - New item prototype for pool fragmentation percentage
+  - Trigger for high fragmentation (>40%)
+- **Volume I/O Latency & Queue Depth**
+  - Read latency (ms)
+  - Write latency (ms)
+  - Trigger for high write latency (>20 ms)
+- **Disk Error‑Rate Analytics**
+  - New dependent item combining reallocated, pending, and uncorrectable sectors
+  - Trigger for high disk error score
+- **NVMe SMART Expansion**
+  - NVMe temperature monitoring
+  - Trigger for high NVMe temperature (>70°C)
+
+### Improved
+- Unified macro usage across all disk‑related items (`{#HDDINDEX}`, `{#HDDSLOT}`)
+- Enhanced disk health analytics with SMART‑based error scoring
+- Improved RAID monitoring with consistency/scrub visibility
+- Expanded NVMe monitoring to include SMART‑level temperature
+- Added latency‑focused metrics for volume performance diagnostics
+- Strengthened pool monitoring with fragmentation metrics
+
+### Fixed
+- Corrected SNMP OIDs for SMART and RAID scrub attributes
+- Resolved missing master_item references in dependent items
+- Fixed inconsistent macro usage in disk‑related triggers
+- Eliminated legacy SMART OID references from older QNAP branches
+- Corrected volume latency item keys for compatibility with Zabbix 7.4+
+
+### Removed
+- Deprecated legacy SMART items from pre‑55062 OID branches
+- Removed unused RAID scrub counters from older firmware versions
+
+---
+
+## Summary
+Version **0.7.0** introduces full SMART attribute discovery, RAID consistency monitoring, pool fragmentation analytics, and volume latency metrics. This release significantly enhances predictive diagnostics, performance visibility, and long‑term storage reliability across all QNAP NAS platforms.
