@@ -429,3 +429,56 @@ Version **0.6.0** introduces the first generation of **predictive analytics** fo
 
 ## Summary
 Version **0.7.0** introduces full SMART attribute discovery, RAID consistency monitoring, pool fragmentation analytics, and volume latency metrics. This release significantly enhances predictive diagnostics, performance visibility, and long‑term storage reliability across all QNAP NAS platforms.
+
+---
+
+## [0.8.0] — SMART Anomalies, Disk Lifetime Forecasting, RAID Speed Analytics
+**Release date:** 2026‑06‑16  
+**Author:** Majid Abdollahi
+
+### Added
+- **SMART Anomaly Detection**
+  - New dependent item calculating anomaly score using 7‑day statistical baselines
+  - Detects abnormal increases in reallocated, pending, and uncorrectable sectors
+  - Trigger for high anomaly score (>50)
+- **Disk Lifetime Forecasting (Remaining Days)**
+  - New dependent item estimating remaining disk lifetime using:
+    - Remaining life %
+    - Wear‑leveling count
+    - SMART anomaly score
+  - Trigger for critically low lifetime (<30 days)
+- **RAID Rebuild Speed Analytics**
+  - New dependent item estimating rebuild speed (MB/s) using short‑term progress deltas
+  - Trigger for abnormally slow rebuild (<5 MB/s)
+- **Thermal Stress Index (TSI)**
+  - Combines temperature, temperature drift, and SMART anomalies
+  - Trigger for high thermal stress (>80)
+- **Volume Performance Anomaly Detection**
+  - New dependent item comparing read/write latency to 1‑hour baselines
+  - Trigger for performance anomaly (>60)
+- **Pool Fragmentation Trend Analysis**
+  - New dependent item calculating 24‑hour fragmentation drift
+  - Trigger for rapidly increasing fragmentation (>10)
+
+### Improved
+- Enhanced SMART monitoring with anomaly‑based scoring instead of static thresholds
+- Improved disk health modeling with lifetime forecasting logic
+- Strengthened RAID monitoring with rebuild‑speed analytics
+- Expanded temperature monitoring with thermal stress index
+- Improved volume performance visibility with anomaly scoring
+- Added trend‑based fragmentation analysis for storage pools
+
+### Fixed
+- Corrected dependent‑item master references for SMART‑based analytics
+- Resolved inconsistencies in SMART OID mapping across HDD models
+- Fixed missing trendavg() windows for latency and fragmentation calculations
+- Eliminated legacy SMART attribute references from pre‑55062 firmware
+
+### Removed
+- Deprecated static SMART threshold triggers (replaced by anomaly‑based scoring)
+- Removed unused RAID rebuild counters from older QNAP firmware
+
+---
+
+## Summary
+Version **0.8.0** introduces advanced analytics and forecasting capabilities, including SMART anomaly detection, disk lifetime estimation, RAID rebuild speed analysis, thermal stress scoring, and performance anomaly detection. This release significantly enhances predictive maintenance, early‑warning accuracy, and long‑term reliability insights for QNAP NAS environments.
