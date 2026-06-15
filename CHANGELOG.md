@@ -380,8 +380,6 @@ Version **0.6.0** introduces the first generation of **predictive analytics** fo
 
 ---
 
-# QNAP NAS LLD SNMP — Changelog
-
 ## [0.7.0] — SMART LLD, RAID Consistency, Pool Fragmentation, I/O Latency
 **Release date:** 2026‑06‑15  
 **Author:** Majid Abdollahi
