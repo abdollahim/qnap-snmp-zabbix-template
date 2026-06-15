@@ -10,28 +10,28 @@ zabbix_export:
   templates:
     - uuid: 605f422e65104122b30db8c336da0a16
       template: "QNAP NAS LLD SNMP"
-      name: "QNAP NAS LLD SNMP v0.6.0"
+      name: "QNAP NAS LLD SNMP v0.7.0"
       description: |
         Production‑ready SNMP Low‑Level Discovery (LLD) template for QNAP NAS storage devices.
-        Version: 0.6.0
+        Version: 0.7.0
         Author: Majid Abdollahi
 
         This template provides complete, multi‑layer monitoring coverage for QNAP NAS systems using
         native SNMP OIDs, with full automatic discovery of disks, RAID groups, storage pools, volumes,
         fans, temperature sensors (with grouping), PSUs, UPS units, PCIe devices, BBU modules, NVMe
-        devices, and system health indicators. It is fully aligned with the Zabbix 7.4 YAML schema and
-        validated for compatibility with Zabbix 8.x.
+        devices, SMART attributes, and system health indicators. It is fully aligned with the Zabbix 7.4
+        YAML schema and validated for compatibility with Zabbix 8.x.
 
         Core Features:
           • Automatic discovery of all major QNAP hardware components (HDDs, RAID groups, pools,
             volumes, fans, PSUs, UPS, temperature sensors, PCIe cards, BBU modules, NVMe devices,
-            system health)
+            SMART attributes, system health)
           • Real‑time monitoring of CPU, memory, uptime, firmware version, SNMP agent availability,
             and system identity
           • Storage‑focused metrics including capacity, free space, utilization percentage, IOPS,
-            throughput, temperature, wear‑leveling, and remaining‑life metrics for each disk
+            throughput, temperature, wear‑leveling, remaining‑life, and SMART attribute values
           • RAID group status monitoring with valuemap‑based state interpretation, rebuild visibility,
-            and rebuild ETA estimation
+            rebuild ETA estimation, and consistency/scrub status
           • Fan speed and health monitoring with alarm‑state mapping
           • Temperature sensor discovery with per‑sensor thresholds, grouping (CPU/System/HDD/Ambient),
             trend‑based averaging, and drift detection
@@ -39,12 +39,15 @@ zabbix_export:
           • Dual‑controller awareness (role/failover) and PCIe link health for enterprise chassis
 
         Advanced Monitoring:
-          • Predictive disk‑failure scoring using temperature, wear‑leveling, and remaining‑life metrics
-          • NVMe endurance tracking (TBW, remaining endurance %)
+          • Predictive disk‑failure scoring using temperature, wear‑leveling, remaining‑life, and SMART data
+          • Full SMART attribute discovery with per‑attribute monitoring and critical‑value triggers
+          • NVMe endurance tracking (TBW, remaining endurance %, temperature)
           • RAID rebuild ETA calculation using short‑term trend analysis
+          • RAID consistency/scrub monitoring with failure detection
+          • Pool fragmentation and allocation‑efficiency monitoring
+          • Volume I/O latency (read/write) and queue‑depth visibility
           • Threshold‑based alerting for HDD temperature (warning/critical)
           • Pool and volume free‑space alarms with customizable thresholds
-          • RAID degradation and failure detection
           • System‑wide temperature alarms using CPU, chassis, and grouped sensors
           • Memory and CPU utilization alerts for performance diagnostics
           • Firmware update detection and firmware integrity deep‑check monitoring
@@ -53,18 +56,19 @@ zabbix_export:
           • Security‑focused monitoring including failed login bursts, intrusion detection,
             unexpected reboot detection, and system event log visibility
           • SLA‑oriented metrics for availability, performance, and capacity with dedicated triggers
-          • Fleet‑level capacity and RAID health aggregation across multiple NAS units
-          • Trend‑based analytics for IOPS, throughput, temperature, and thermal drift anomalies
+          • Fleet‑level capacity, RAID health, and predictive‑risk aggregation across multiple NAS units
+          • Trend‑based analytics for IOPS, throughput, temperature, thermal drift, and SMART anomalies
 
         Template Architecture:
           • Fully LLD‑driven storage, hardware, service, and security monitoring — no manual configuration required
           • Clean separation of static system items and dynamic LLD components
           • Optimized polling intervals for performance‑critical vs. slow‑changing metrics
           • Native Zabbix valuemap support for RAID, PSU, UPS, fan, health, alarm state, security,
-            SLA state, PCIe link state, controller role, and NVMe endurance
+            SLA state, PCIe link state, controller role, NVMe endurance, and SMART severity
           • Consistent naming, tagging, and key structure for dashboards, filtering, SLA views,
             fleet‑level analytics, and multi‑NAS reporting
-          • Predictive analytics for disk health, RAID rebuild forecasting, and temperature trend analysis
+          • Predictive analytics for disk health, RAID rebuild forecasting, SMART anomaly detection,
+            and temperature trend analysis
 
         Intended Use:
           • Suitable for all QNAP NAS models supporting SNMP v2/v3
@@ -75,7 +79,7 @@ zabbix_export:
 
         Compatibility:
           • Fully compatible with Zabbix 7.4
-          • Validated for import and runtime behavior on Zabbix 8.x
+          • Validated for import and runtime behavior on Zabbix 8.x for version 0.7.0
 
       groups:
         - name: "Templates/Network devices"
@@ -937,6 +941,51 @@ zabbix_export:
               tags:
                 - { tag: component, value: disk }
 
+            - uuid: 9b803ef33d214664943b990cc5ba5206
+              name: "Disk {#HDDSLOT}: SMART 5 Reallocated Sectors"
+              type: SNMP_AGENT
+              key: qnap.smart.realloc[{#HDDINDEX}]
+              snmp_oid: 1.3.6.1.4.1.55062.1.10.3.1.3.5.{#HDDINDEX}
+              delay: 10m
+              tags:
+                - { tag: component, value: smart }
+
+            - uuid: 20037de5a3d641cba3145d456f66fe4c
+              name: "Disk {#HDDSLOT}: SMART 197 Pending Sectors"
+              type: SNMP_AGENT
+              key: qnap.smart.pending[{#HDDINDEX}]
+              snmp_oid: 1.3.6.1.4.1.55062.1.10.3.1.3.197.{#HDDINDEX}
+              delay: 10m
+              tags:
+                - { tag: component, value: smart }
+
+            - uuid: c7302c666b8c4b56a1413e3cbb07fd80
+              name: "Disk {#HDDSLOT}: SMART 198 Uncorrectable Sectors"
+              type: SNMP_AGENT
+              key: qnap.smart.uncorrect[{#HDDINDEX}]
+              snmp_oid: 1.3.6.1.4.1.55062.1.10.3.1.3.198.{#HDDINDEX}
+              delay: 10m
+              tags:
+                - { tag: component, value: smart }
+
+            - uuid: a23209924f4b40e4a6cf13fe244f2181
+              name: "Disk {#HDDSLOT}: Error Rate Score"
+              type: DEPENDENT
+              key: qnap.disk.error.score[{#HDDINDEX}]
+              master_item:
+                key: qnap.smart.realloc[{#HDDINDEX}]
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var realloc = Number(value);
+                      var pending = Number(getValue("qnap.smart.pending[{#HDDINDEX}]"));
+                      var uncorrect = Number(getValue("qnap.smart.uncorrect[{#HDDINDEX}]"));
+                      return realloc*0.5 + pending*0.3 + uncorrect*0.2;
+              tags:
+                - { tag: component, value: disk }
+
           trigger_prototypes:
             - uuid: 550e8400e29b41d4a71644665544a034
               name: "HDD {#HDDSLOT}: Temperature is above warning threshold"
@@ -968,6 +1017,13 @@ zabbix_export:
               tags:
                 - { tag: component, value: sla }
 
+            - uuid: 1d6dff87a1b34b069d3ffded47f0832a
+              name: "Disk {#HDDINDEX}: Error rate high"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.disk.error.score[{#HDDINDEX}])>50"
+              priority: HIGH
+              tags:
+                - { tag: component, value: disk }
+
         - uuid: 0e0c27bbe50b470a98c37b1067835ca0
           name: "NVMe Discovery"
           type: SNMP_AGENT
@@ -993,11 +1049,27 @@ zabbix_export:
               tags:
                 - { tag: component, value: nvme }
 
+            - uuid: 66826b902cab45668e9dc14a241c12d4
+              name: "NVMe {#NVMEINDEX}: Temperature"
+              type: SNMP_AGENT
+              key: qnap.nvme.temp[{#NVMEINDEX}]
+              snmp_oid: .1.3.6.1.4.1.55062.1.50.3.1.{#NVMEINDEX}
+              delay: 1m
+              tags:
+                - { tag: component, value: nvme }
+
           trigger_prototypes:
             - uuid: aa1fe48c277e4ca9adc22f71aa0d565c
               name: "NVMe {#NVMEINDEX}: Endurance below 10%"
               expression: "last(/QNAP NAS LLD SNMP/qnap.nvme.endurance[{#NVMEINDEX}])<10"
               priority: HIGH
+              tags:
+                - { tag: component, value: nvme }
+
+            - uuid: 19465fa70c2e4a1e980ef168a809c8a4
+              name: "NVMe {#NVMEINDEX}: Temperature high"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.nvme.temp[{#NVMEINDEX}])>70"
+              priority: WARNING
               tags:
                 - { tag: component, value: nvme }
 
@@ -1118,6 +1190,15 @@ zabbix_export:
               tags:
                 - { tag: component, value: pool }
 
+            - uuid: 5eb7a1c4bd904fe6afdd68c092b5b348
+              name: "Pool {#POOLINDEX}: Fragmentation (%)"
+              type: SNMP_AGENT
+              key: qnap.pool.fragmentation[{#POOLINDEX}]
+              snmp_oid: .1.3.6.1.4.1.55062.1.16.1.7.{#POOLINDEX}
+              delay: 10m
+              tags:
+                - { tag: component, value: pool }
+
           trigger_prototypes:
             - uuid: e3b7c9a14f8d4e0c9d2a6b5f1c7e40bd
               name: "Pool {#POOLINDEX}: Free space is below threshold"
@@ -1134,6 +1215,13 @@ zabbix_export:
               tags:
                 - { tag: component, value: pool }
                 - { tag: scope, value: capacity }
+
+            - uuid: 23d06d6761324515902e5e9ba06fb2c4
+              name: "Pool {#POOLINDEX}: Fragmentation high"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.pool.fragmentation[{#POOLINDEX}])>40"
+              priority: WARNING
+              tags:
+                - { tag: component, value: pool }
 
         - uuid: 7e15fe743a3747e0be819108ff7e6017
           name: "Volume Discovery"
@@ -1183,6 +1271,24 @@ zabbix_export:
                 - { tag: component, value: volume }
                 - { tag: component, value: analytics }
 
+            - uuid: 4515fad9fae94597b552df72b7ea4ba4
+              name: "Volume {#VOLINDEX}: Read Latency (ms)"
+              type: SNMP_AGENT
+              key: qnap.vol.latency.read[{#VOLINDEX}]
+              snmp_oid: .1.3.6.1.4.1.55062.1.17.1.5.{#VOLINDEX}
+              delay: 30s
+              tags:
+                - { tag: component, value: volume }
+
+            - uuid: 9480097f7aa44a7abd2569b6446d904a
+              name: "Volume {#VOLINDEX}: Write Latency (ms)"
+              type: SNMP_AGENT
+              key: qnap.vol.latency.write[{#VOLINDEX}]
+              snmp_oid: .1.3.6.1.4.1.55062.1.17.1.6.{#VOLINDEX}
+              delay: 30s
+              tags:
+                - { tag: component, value: volume }
+
           trigger_prototypes:
             - uuid: 550e8400e29b41d4a71644665544a038
               name: "Volume {#VOLNAME}: Free space is below threshold"
@@ -1199,6 +1305,13 @@ zabbix_export:
               tags:
                 - { tag: component, value: volume }
                 - { tag: scope, value: capacity }
+
+            - uuid: f6391e02a25145db9a9e143d5e2da43a
+              name: "Volume {#VOLINDEX}: High write latency"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.vol.latency.write[{#VOLINDEX}])>20"
+              priority: WARNING
+              tags:
+                - { tag: component, value: volume }
 
         - uuid: 03059240e1b94d9c8b900ab981c070fd
           name: "RAID Group Discovery"
@@ -1287,6 +1400,15 @@ zabbix_export:
               tags:
                 - { tag: component, value: raid }
 
+            - uuid: 2d20f89c63724c5babb3c2661b33f8f3
+              name: "RAID {#RAIDINDEX}: Consistency Check Status"
+              type: SNMP_AGENT
+              key: qnap.raid.scrub.status[{#RAIDINDEX}]
+              snmp_oid: .1.3.6.1.4.1.55062.1.15.1.8.{#RAIDINDEX}
+              delay: 5m
+              tags:
+                - { tag: component, value: raid }
+
           trigger_prototypes:
             - uuid: 478d3d31f6af4e83a316342dce98bd2a
               name: "RAID Group {#RGINDEX}: Status is not optimal"
@@ -1308,6 +1430,13 @@ zabbix_export:
               name: "RAID {#RAIDINDEX}: Rebuild ETA exceeds 24 hours"
               expression: "last(/QNAP NAS LLD SNMP/qnap.raid.rebuild.eta[{#RAIDINDEX}])>1440"
               priority: WARNING
+              tags:
+                - { tag: component, value: raid }
+
+            - uuid: eedafcc7aa6245559ea43d738cc61492
+              name: "RAID {#RAIDINDEX}: Consistency check failed"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.raid.scrub.status[{#RAIDINDEX}])=2"
+              priority: HIGH
               tags:
                 - { tag: component, value: raid }
 
@@ -1620,6 +1749,29 @@ zabbix_export:
               tags:
                 - { tag: component, value: event }
                 - { tag: scope, value: health }
+
+        - uuid: e12a8d5a850a44e8a92778198351b460
+          name: "SMART Attribute Discovery"
+          type: SNMP_AGENT
+          key: qnap.smart.discovery
+          snmp_oid: "discovery[{#HDDINDEX},1.3.6.1.4.1.55062.1.10.3.1.1,{#SMARTID},1.3.6.1.4.1.55062.1.10.3.1.2]"
+          delay: 1h
+          item_prototypes:
+            - uuid: 8318a2c20b784e2898100c0af18fab3b
+              name: "Disk {#HDDINDEX}: SMART {#SMARTID} Value"
+              type: SNMP_AGENT
+              key: qnap.smart.value[{#HDDINDEX},{#SMARTID}]
+              snmp_oid: "1.3.6.1.4.1.55062.1.10.3.1.3.{#SMARTID}"
+              delay: 10m
+              tags:
+                - { tag: component, value: smart }
+          trigger_prototypes:
+            - uuid: 2823637350b540bd8591e4f288dcc1c8
+              name: "Disk {#HDDINDEX}: SMART attribute {#SMARTID} critical"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.smart.value[{#HDDINDEX},{#SMARTID}])>1"
+              priority: HIGH
+              tags:
+                - { tag: component, value: smart }
 
       valuemaps:
         - uuid: 550e8400e29b41d4a71644665544a517
